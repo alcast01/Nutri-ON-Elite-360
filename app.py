@@ -526,6 +526,109 @@ else:
 factor_lodo = 1.00 if condicion_lodo == "Seco y Confortable" else (1.12 if "Moderado" in condicion_lodo else 1.25)
 cms_estimado = peso_actual * 0.024 * factor_clima * factor_thi * factor_cc * factor_sistema_cms / (factor_lodo if "Severo" in condicion_lodo else 1.0)
 
+# --- FUNCIÓN DEL MOTOR DE OPTIMIZACIÓN LINEAL DE PRECISIÓN NUTRICIONAL ---
+class OptimizeResultCompat:
+    def __init__(self, success, fun, x, message=""):
+        self.success = success
+        self.fun = fun
+        self.x = x
+        self.message = message
+
+def optimizar_dieta_precision(df_ingredientes, requerimientos):
+    try:
+        nombres = df_ingredientes["Nombre del Ingrediente"].astype(str).values
+        costos = df_ingredientes["Precio Estimado (MXN/ton)"].astype(float).values
+        
+        pc = df_ingredientes["Proteina Cruda (PC % MS)"].astype(float).values / 100.0
+        neg = df_ingredientes["NEg (Mcal/kg)"].astype(float).values
+        fnd = df_ingredientes["FND (% MS)"].astype(float).values / 100.0
+        pendf = df_ingredientes["peNDF (% MS)"].astype(float).values / 100.0
+        pdr = df_ingredientes["PDR (% MS)"].astype(float).values / 100.0
+        pnd = df_ingredientes["PND (% MS)"].astype(float).values / 100.0
+        ca = df_ingredientes["Calcio (Ca %)"].astype(float).values / 100.0
+        p_min_ing = df_ingredientes["Fosforo (P %)"].astype(float).values / 100.0
+        
+        disponibles = df_ingredientes["Disponible"].astype(bool).values
+    except KeyError as e:
+        return OptimizeResultCompat(False, 0.0, np.array([]), f"Falta columna: {e}")
+
+    bounds = []
+    for idx, row in df_ingredientes.iterrows():
+        if not row["Disponible"]:
+            bounds.append((0.0, 0.0))
+        else:
+            min_lim = max(0.0, float(row["Min Inclusión (%)"]) / 100.0)
+            max_lim = min(1.0, float(row["Max Inclusión (%)"]) / 100.0)
+            bounds.append((min_lim, max_lim))
+
+    A_eq = np.ones((1, len(costos)))
+    b_eq = np.array([1.0])
+
+    req_pc = requerimientos.get("PC_min", 0.12)
+    req_neg = requerimientos.get("NEg_min", 1.10)
+    req_fnd_min = requerimientos.get("FND_min", 0.25)
+    req_fnd_max = requerimientos.get("FND_max", 0.50)
+    req_pendf = requerimientos.get("peNDF_min", 0.18)
+    req_rdp = requerimientos.get("RDP_min", 0.065)
+    req_rup = requerimientos.get("RUP_min", 0.035)
+    req_ca = requerimientos.get("Ca_min", 0.0045)
+    req_p = requerimientos.get("P_min", 0.0028)
+
+    row_cap_min = -ca + 1.5 * p_min_ing
+    row_cap_max = ca - 2.5 * p_min_ing
+
+    A_ub = np.array([
+        -pc,
+        -neg,
+        -fnd,
+         fnd,
+        -pendf,
+        -pdr,
+        -pnd,
+        -ca,
+        -p_min_ing,
+         row_cap_min,
+         row_cap_max
+    ])
+
+    b_ub = np.array([
+        -req_pc,
+        -req_neg,
+        -req_fnd_min,
+         req_fnd_max,
+        -req_pendf,
+        -req_rdp,
+        -req_rup,
+        -req_ca,
+        -req_p,
+        0.0,
+        0.0
+    ])
+
+    res = linprog(costos, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
+    
+    if res.success:
+        return OptimizeResultCompat(True, res.fun, res.x, "Factible")
+    
+    b_ub_rel = np.array([
+        -req_pc * 0.90,
+        -req_neg * 0.90,
+        -req_fnd_min,
+         req_fnd_max,
+        -req_pendf * 0.85,
+        -req_rdp * 0.85,
+        -req_rup * 0.85,
+        -req_ca * 0.85,
+        -req_p * 0.85,
+        0.0,
+        0.0
+    ])
+    res_rel = linprog(costos, A_ub=A_ub, b_ub=b_ub_rel, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
+    if res_rel.success:
+        return OptimizeResultCompat(True, res_rel.fun, res_rel.x, "Factible con tolerancia ajustada")
+        
+    return OptimizeResultCompat(False, 4500.0, np.zeros(len(costos)), "Sin solución factible estricta")
+
 if modo_gde == "Automático Elite (Máxima GDE al Mínimo Costo x kg)":
     mejor_gde = 1.2
     menor_costo_kg_ganado = float('inf')
@@ -643,113 +746,6 @@ factor_compensatorio = 0.93 if "Compensatorio" in historial_nutricional else 1.0
 meta_pc_min = meta_pc_base * factor_pc * factor_sexo_pc * factor_promotor
 meta_neg_min = meta_neg_base * factor_neg * factor_sexo_neg * factor_marco * factor_lodo * factor_compensatorio
 
-# --- FUNCIÓN DEL MOTOR DE OPTIMIZACIÓN LINEAL DE PRECISIÓN NUTRICIONAL ---
-class OptimizeResultCompat:
-    def __init__(self, success, fun, x, message=""):
-        self.success = success
-        self.fun = fun
-        self.x = x
-        self.message = message
-
-def optimizar_dieta_precision(df_ingredientes, requerimientos):
-    """
-    Motor Avanzado de Programación Lineal de Precisión Nutricional (NutriON 360 Ultra)
-    Garantiza costos mínimos cumpliendo con RDP, RUP, peNDF y minerales.
-    """
-    try:
-        nombres = df_ingredientes["Nombre del Ingrediente"].astype(str).values
-        costos = df_ingredientes["Precio Estimado (MXN/ton)"].astype(float).values
-        
-        pc = df_ingredientes["Proteina Cruda (PC % MS)"].astype(float).values / 100.0
-        neg = df_ingredientes["NEg (Mcal/kg)"].astype(float).values
-        fnd = df_ingredientes["FND (% MS)"].astype(float).values / 100.0
-        pendf = df_ingredientes["peNDF (% MS)"].astype(float).values / 100.0
-        pdr = df_ingredientes["PDR (% MS)"].astype(float).values / 100.0
-        pnd = df_ingredientes["PND (% MS)"].astype(float).values / 100.0
-        ca = df_ingredientes["Calcio (Ca %)"].astype(float).values / 100.0
-        p_min_ing = df_ingredientes["Fosforo (P %)"].astype(float).values / 100.0
-        
-        disponibles = df_ingredientes["Disponible"].astype(bool).values
-    except KeyError as e:
-        return OptimizeResultCompat(False, 0.0, np.array([]), f"Falta columna: {e}")
-
-    bounds = []
-    for idx, row in df_ingredientes.iterrows():
-        if not row["Disponible"]:
-            bounds.append((0.0, 0.0))
-        else:
-            min_lim = max(0.0, float(row["Min Inclusión (%)"]) / 100.0)
-            max_lim = min(1.0, float(row["Max Inclusión (%)"]) / 100.0)
-            bounds.append((min_lim, max_lim))
-
-    A_eq = np.ones((1, len(costos)))
-    b_eq = np.array([1.0])
-
-    req_pc = requerimientos.get("PC_min", 0.12)
-    req_neg = requerimientos.get("NEg_min", 1.10)
-    req_fnd_min = requerimientos.get("FND_min", 0.25)
-    req_fnd_max = requerimientos.get("FND_max", 0.50)
-    req_pendf = requerimientos.get("peNDF_min", 0.18)
-    req_rdp = requerimientos.get("RDP_min", 0.065)
-    req_rup = requerimientos.get("RUP_min", 0.035)
-    req_ca = requerimientos.get("Ca_min", 0.0045)
-    req_p = requerimientos.get("P_min", 0.0028)
-
-    row_cap_min = -ca + 1.5 * p_min_ing
-    row_cap_max = ca - 2.5 * p_min_ing
-
-    A_ub = np.array([
-        -pc,
-        -neg,
-        -fnd,
-         fnd,
-        -pendf,
-        -pdr,
-        -pnd,
-        -ca,
-        -p_min_ing,
-         row_cap_min,
-         row_cap_max
-    ])
-
-    b_ub = np.array([
-        -req_pc,
-        -req_neg,
-        -req_fnd_min,
-         req_fnd_max,
-        -req_pendf,
-        -req_rdp,
-        -req_rup,
-        -req_ca,
-        -req_p,
-        0.0,
-        0.0
-    ])
-
-    res = linprog(costos, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
-    
-    if res.success:
-        return OptimizeResultCompat(True, res.fun, res.x, "Factible")
-    
-    b_ub_rel = np.array([
-        -req_pc * 0.90,
-        -req_neg * 0.90,
-        -req_fnd_min,
-         req_fnd_max,
-        -req_pendf * 0.85,
-        -req_rdp * 0.85,
-        -req_rup * 0.85,
-        -req_ca * 0.85,
-        -req_p * 0.85,
-        0.0,
-        0.0
-    ])
-    res_rel = linprog(costos, A_ub=A_ub, b_ub=b_ub_rel, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
-    if res_rel.success:
-        return OptimizeResultCompat(True, res_rel.fun, res_rel.x, "Factible con tolerancia ajustada")
-        
-    return OptimizeResultCompat(False, 4500.0, np.zeros(len(costos)), "Sin solución factible estricta")
-
 # --- EJECUCIÓN DEL MOTOR DE PRECISIÓN ---
 requerimientos_lote = {
     "PC_min": meta_pc_min,
@@ -778,6 +774,46 @@ costo_total_cab = costo_compra_cab + costo_alimentacion_cab + costo_total_sanida
 ingreso_venta_cab = peso_objetivo * precio_venta_kg
 utilidad_neta_cab = ingreso_venta_cab - costo_total_cab
 roi_cab = (utilidad_neta_cab / costo_total_cab) * 100 if costo_total_cab > 0 else 0
+
+# --- CÁLCULO GLOBAL DE EMISIONES Y NUTRIENTES (GLOBAL SCOPE) ---
+if resultado.success:
+    pc_arr = df_base["Proteina Cruda (PC % MS)"].astype(float).values / 100.0
+    neg_arr = df_base["NEg (Mcal/kg)"].astype(float).values
+    fnd_arr = df_base["FND (% MS)"].astype(float).values / 100.0
+    pendf_arr = df_base["peNDF (% MS)"].astype(float).values / 100.0
+    ca_arr = df_base["Calcio (Ca %)"].astype(float).values / 100.0
+    p_arr = df_base["Fosforo (P %)"].astype(float).values / 100.0
+    lip_arr = df_base["Lípidos / Extracto Etéreo (%)"].astype(float).values / 100.0
+
+    aporte_pc = np.sum(resultado.x * pc_arr) * 100
+    aporte_neg = np.sum(resultado.x * neg_arr)
+    aporte_fnd = np.sum(resultado.x * fnd_arr) * 100
+    aporte_pendf = np.sum(resultado.x * pendf_arr) * 100
+    aporte_ca = np.sum(resultado.x * ca_arr) * 100
+    aporte_p = np.sum(resultado.x * p_arr) * 100
+    aporte_lipidos = np.sum(resultado.x * lip_arr) * 100
+    
+    relacion_ca_p = (aporte_ca / aporte_p) if aporte_p > 0 else 0
+    ge_diaria = cms_estimado * 18.4 
+    reduccion_lipidica = max(0.0, (aporte_lipidos - 3.0) * 0.003)
+    reduccion_ionoforo = 0.06 if "Ionóforos" in aditivo_ruminal or "Ambos" in aditivo_ruminal else 0.0
+    
+    factor_fnd_ym = 0.035 + (aporte_fnd / 100.0) * 0.035
+    ym_ajustado = max(0.025, factor_fnd_ym - reduccion_lipidica - reduccion_ionoforo)
+    
+    ch4_g_dia = (ge_diaria * ym_ajustado / 55.65) * 1000
+    co2e_anual = (ch4_g_dia * 365 / 1000.0) * 28.0 
+else:
+    aporte_pc = 12.0
+    aporte_neg = 1.1
+    aporte_fnd = 30.0
+    aporte_pendf = 20.0
+    aporte_ca = 0.5
+    aporte_p = 0.3
+    aporte_lipidos = 3.0
+    relacion_ca_p = 1.6
+    ch4_g_dia = 200.0
+    co2e_anual = 2000.0
 
 # --- FUNCIÓN GENERADORA DE PDF ---
 class PDFReport(FPDF):
@@ -1030,35 +1066,9 @@ with tab3:
         df_mezcla_final = pd.DataFrame(tabla_mezcla_con_totales)
         st.dataframe(df_mezcla_final, use_container_width=True, hide_index=True)
         
-        pc_arr = df_base["Proteina Cruda (PC % MS)"].astype(float).values / 100.0
-        neg_arr = df_base["NEg (Mcal/kg)"].astype(float).values
-        fnd_arr = df_base["FND (% MS)"].astype(float).values / 100.0
-        pendf_arr = df_base["peNDF (% MS)"].astype(float).values / 100.0
-        ca_arr = df_base["Calcio (Ca %)"].astype(float).values / 100.0
-        p_arr = df_base["Fosforo (P %)"].astype(float).values / 100.0
-        lip_arr = df_base["Lípidos / Extracto Etéreo (%)"].astype(float).values / 100.0
-
-        aporte_pc = np.sum(resultado.x * pc_arr) * 100
-        aporte_neg = np.sum(resultado.x * neg_arr)
-        aporte_fnd = np.sum(resultado.x * fnd_arr) * 100
-        aporte_pendf = np.sum(resultado.x * pendf_arr) * 100
-        aporte_ca = np.sum(resultado.x * ca_arr) * 100
-        aporte_p = np.sum(resultado.x * p_arr) * 100
-        aporte_lipidos = np.sum(resultado.x * lip_arr) * 100
-        
-        relacion_ca_p = (aporte_ca / aporte_p) if aporte_p > 0 else 0
         status_ca_p = "🟢 Óptimo"
         riesgo_sara = "🟢 Seguro" if aporte_pendf >= 18.0 else ("🟡 Monitorear" if aporte_pendf >= 14.0 else "🔴 Alto Riesgo")
         
-        ge_diaria = cms_estimado * 18.4 
-        reduccion_lipidica = max(0.0, (aporte_lipidos - 3.0) * 0.003)
-        reduccion_ionoforo = 0.06 if "Ionóforos" in aditivo_ruminal or "Ambos" in aditivo_ruminal else 0.0
-        
-        factor_fnd_ym = 0.035 + (aporte_fnd / 100.0) * 0.035
-        ym_ajustado = max(0.025, factor_fnd_ym - reduccion_lipidica - reduccion_ionoforo)
-        
-        ch4_g_dia = (ge_diaria * ym_ajustado / 55.65) * 1000
-        co2e_anual = (ch4_g_dia * 365 / 1000.0) * 28.0 
         linea_base_co2e = 4200.0
         ahorro_co2e_kg = max(0.0, linea_base_co2e - co2e_anual)
         valor_bono_mxn = (ahorro_co2e_kg / 1000.0) * 350.0
