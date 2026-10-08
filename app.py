@@ -397,4 +397,59 @@ if "df_collares_state" not in st.session_state:
             estados_salud.append("🟢 Sano / Activo")
             visitas_com.append(int(np.random.randint(8, 15)))
             min_masticacion.append(int(np.random.randint(520, 680)))
-        elif r <
+        elif r < 0.90:
+            estados_salud.append("🟡 Alerta (Bajo Consumo)")
+            visitas_com.append(int(np.random.randint(3, 6)))
+            min_masticacion.append(int(np.random.randint(380, 480)))
+        else:
+            estados_salud.append("🔴 Enfermo / Riesgo (Descarte)")
+            visitas_com.append(int(np.random.randint(0, 2)))
+            min_masticacion.append(int(np.random.randint(150, 320)))
+            
+    st.session_state.df_collares_state = pd.DataFrame({
+        "ID Arete / Animal": ids_animales,
+        "Estatus Collares IoT": estados_salud,
+        "Visitas Comedero (visitas/día)": visitas_com,
+        "Masticación / Rumina (min/día)": min_masticacion,
+        "Acción IA Recomendada": [
+            "Ninguna (Lote Óptimo)" if "Sano" in s else ("Aislar y revisar temperatura" if "Alerta" in s else "Descarte / Tratamiento urgente por ineficiencia") for s in estados_salud
+        ]
+    })
+
+# --- 5. BARRA LATERAL ---
+st.sidebar.markdown(f"### 🎛️ Panel Ultra AI NutriON")
+st.sidebar.markdown(f"👤 **Usuario:** {st.session_state.current_user.capitalize()}")
+st.sidebar.markdown(f"🛡️ **Licencia:** {plan_activo_usuario}")
+
+with st.sidebar.expander("🔄 Gestión de Suscripción Ultra", expanded=True):
+    st.markdown(f"**Próxima Renovación:** `{next_ren_date}`")
+    
+    nuevo_estado_auto = st.checkbox("Renovación Automática", value=auto_renew_status, key="sidebar_auto_renew_toggle")
+    
+    if nuevo_estado_auto != auto_renew_status:
+        db_all = cargar_usuarios_persistentes()
+        if st.session_state.current_user in db_all:
+            db_all[st.session_state.current_user]["auto_renew"] = nuevo_estado_auto
+            guardar_usuarios_persistentes(db_all)
+            st.success("¡Estado de renovación actualizado!")
+            st.rerun()
+            
+    if nuevo_estado_auto:
+        st.info("🟢 Tu suscripción se renovará automáticamente al finalizar el periodo.")
+    else:
+        st.warning("🟡 La renovación automática está desactivada.")
+
+if st.sidebar.button("🚪 Cerrar Sesión", use_container_width=True):
+    st.session_state.authenticated = False
+    st.session_state.current_user = ""
+    st.rerun()
+
+st.sidebar.markdown("---")
+
+with st.sidebar.expander("🐄 1. Lote, Pesos y Población", expanded=False):
+    cantidad_animales = st.number_input("Número de Cabezas en el Lote", min_value=1, max_value=5000, value=100, step=10)
+    peso_actual = st.slider("Peso Actual / Compra (kg)", min_value=200.0, max_value=650.0, value=250.0, step=10.0)
+    peso_objetivo = st.slider("Peso de Venta / Meta (kg)", min_value=400.0, max_value=750.0, value=520.0, step=10.0)
+    
+    modo_gde = st.selectbox("Modo de Optimización GDE", ["Manual (Fijo)", "Automático Elite (Máxima GDE al Mínimo Costo x kg)"])
+    if modo
