@@ -6,7 +6,6 @@ import plotly.express as px
 import plotly.graph_objects as go
 from fpdf import FPDF
 from datetime import datetime
-import urllib.parse
 
 # --- 1. CONFIGURACIÓN DE PÁGINA Y DISEÑO SaaS (CALIBRI & UI/UX ULTRA V4.0) ---
 st.set_page_config(
@@ -464,28 +463,8 @@ with tab9:
             st.warning("⚠️ Completa tu nombre y datos de contacto.")
 
 with tab10:
-    st.subheader("📡 Monitoreo, Costos, Sanidad & Alertas WhatsApp")
+    st.subheader("📡 Monitoreo de Costos, insumos y Sanidad")
     st.markdown("""
-        **Control Total de la Empresa Ganadera y Notificaciones Móviles:** Administra los costos fijos por vientre, 
-        evalúa la sanidad preventiva y envía alertas automáticas o notificaciones de prueba directamente a tu teléfono por WhatsApp.
+        **Control Total de la Empresa Ganadera:** Administra con precisión los costos fijos por vientre, 
+        evalúa el impacto de la sanidad preventiva y asegura la máxima rentabilidad en tu sistema de producción bovina.
     """)
-    
-    st.markdown("---")
-    st.markdown("### 📱 Centro de Notificaciones y Alertas por WhatsApp")
-    
-    phone_whatsapp = st.text_input("Número de Teléfono WhatsApp (con código de país, ej. +52...)", value="+52")
-    mensaje_prueba = st.text_area(
-        "Mensaje de Alerta / Prueba", 
-        value=f"🚨 *NutriON 360 ULTRA V4.0* - Alerta Zootécnica y Financiera:\n\n• Vientres: {num_vientres}\n• Utilidad Neta Proyectada: ${utilidad_neta_empresarial:,.0f} MXN\n• Costo Dieta Óptima: ${costo_ton_dieta:,.2f} MXN/ton\n\n_Tecnolog-IA en tus manos por Dr. Alejandro Castañeda Correa_"
-    )
-    
-    if st.button("📲 Enviar Notificación de Prueba por WhatsApp", use_container_width=True):
-        if phone_whatsapp and len(phone_whatsapp) > 5:
-            clean_phone = phone_whatsapp.replace("+", "").replace(" ", "").replace("-", "")
-            msg_encoded = urllib.parse.quote(mensaje_prueba)
-            wa_link = f"https://api.whatsapp.com/send?phone={clean_phone}&text={msg_encoded}"
-            st.success("✅ ¡Notificación de prueba generada con éxito para tu teléfono!")
-            st.markdown(f"👉 **[Haga clic aquí para abrir WhatsApp y enviar la alerta a su teléfono]({wa_link})**", unsafe_allow_html=True)
-            st.balloons()
-        else:
-            st.warning("⚠️ Ingrese un número de teléfono válido con código de país (ej. +52...).")
