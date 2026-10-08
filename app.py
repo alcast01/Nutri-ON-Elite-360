@@ -280,4 +280,89 @@ if not st.session_state.authenticated:
         
         try:
             costo_str = plan_elegido.split("-")[1].split("|")[0].strip()
-        except Exception
+        except Exception:
+            costo_str = "$9,600 MXN"
+        
+        if st.button(f"💳 Pagar {costo_str} y Activar Licencia Ultra AI", use_container_width=True):
+            db_usuarios = cargar_usuarios_persistentes()
+            
+            if not new_user or not new_email or not new_pass or not num_tarjeta:
+                st.warning("⚠️ Por favor, completa todos los campos de registro y de pago.")
+            elif new_user in db_usuarios:
+                st.error("⚠️ El nombre de usuario ya existe. Elige otro o inicia sesión.")
+            elif new_pass != confirm_pass:
+                st.error("⚠️ Las contraseñas no coinciden.")
+            elif len(num_tarjeta.replace(" ", "")) < 15:
+                st.error("⚠️ Número de tarjeta inválido. Verifica los dígitos.")
+            else:
+                dias_periodo = 90 if "Trimestral" in plan_elegido else (180 if "Semestral" in plan_elegido else 365)
+                fecha_renovacion = (datetime.now() + timedelta(days=dias_periodo)).strftime("%Y-%m-%d")
+                
+                db_usuarios[new_user] = {
+                    "password": hash_password(new_pass),
+                    "email": new_email,
+                    "subscription_active": True,
+                    "plan": plan_elegido,
+                    "auto_renew": auto_renew_enabled,
+                    "next_renewal_date": fecha_renovacion,
+                    "fecha_registro": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                }
+                guardar_usuarios_persistentes(db_usuarios)
+                
+                st.success(f"🎉 **¡Pago Exitoso de {costo_str} ({plan_elegido})!** Transacción aprobada.")
+                if auto_renew_enabled:
+                    st.info(f"🔄 **Renovación Automática Activada:** Tu próxima renovación está programada para el **{fecha_renovacion}**.")
+                st.success(f"📧 **Notificación Enviada:** Se ha enviado el comprobante fiscal y tus accesos a **{new_email}**.")
+                
+                st.session_state.authenticated = True
+                st.session_state.current_user = new_user
+                st.balloons()
+                st.rerun()
+
+    st.stop()
+
+# --- 3. LOGOTIPO VETERINARIO Y DE CAMPO (USUARIO AUTENTICADO) ---
+db_usuarios_activos = cargar_usuarios_persistentes()
+user_info = db_usuarios_activos.get(st.session_state.current_user, {})
+plan_activo_usuario = user_info.get("plan", "Plan Ultra AI & IoT")
+auto_renew_status = user_info.get("auto_renew", False)
+next_ren_date = user_info.get("next_renewal_date", "N/A")
+
+st.markdown(f"""
+    <div style="display: flex; align-items: center; background: linear-gradient(135deg, #ffffff 0%, #ecfdf5 50%, #fef3c7 100%); padding: 22px 26px; border-radius: 20px; box-shadow: 0 15px 35px -10px rgba(5, 150, 105, 0.15); margin-bottom: 24px; border: 2px solid #34d399; flex-wrap: wrap; gap: 20px;">
+        <div style="flex-shrink: 0; background: linear-gradient(135deg, #059669 0%, #10b981 100%); padding: 12px; border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(5, 150, 105, 0.3);">
+            <svg width="48" height="48" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="32" cy="32" r="30" fill="url(#paint0_linear)" />
+              <path d="M18 36C18 28 24 22 32 22C40 22 46 28 46 36C46 40 43 43 40 44H24C21 43 18 40 18 36Z" fill="#ffffff" fill-opacity="0.2"/>
+              <path d="M22 23L16 16M42 23L48 16" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+              <circle cx="28" cy="32" r="2.5" fill="#fbbf24"/>
+              <circle cx="36" cy="32" r="2.5" fill="#fbbf24"/>
+              <path d="M29 38C30.5 39.5 33.5 39.5 35 38" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M32 14V22" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
+              <path d="M28 17L32 14L36 17" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <defs>
+                <linearGradient id="paint0_linear" x1="4" y1="4" x2="60" y2="60" gradientUnits="userSpaceOnUse">
+                  <stop stop-color="#047857"/>
+                  <stop offset="1" stop-color="#059669"/>
+                </linearGradient>
+              </defs>
+            </svg>
+        </div>
+        <div style="flex-grow: 1; min-width: 240px;">
+            <h1 style="margin: 0; font-size: 1.8em; color: #064e3b; letter-spacing: -0.8px; font-weight: 800; font-family: 'Calibri', sans-serif;">
+                NutriON <span style="background: linear-gradient(135deg, #059669, #10b981); color: #ffffff; padding: 3px 10px; border-radius: 8px; font-size: 0.5em; vertical-align: middle; font-weight: 700; letter-spacing: 0.8px; box-shadow: 0 4px 10px rgba(5,150,105,0.3);">360 ULTRA V4.0</span>
+            </h1>
+            <p style="margin: 2px 0 2px 0; font-size: 0.82em; color: #059669; font-weight: 700; font-family: 'Calibri', sans-serif;">
+                Optimización lineal de precisión, sensores NIR, collares IoT y salud animal en tiempo real.
+            </p>
+            <p style="margin: 3px 0 2px 0; font-size: 0.88em; color: #1e293b; font-weight: 600; font-family: 'Calibri', sans-serif;">
+                Usuario: <span style="color: #059669; font-weight: 700;">{st.session_state.current_user.capitalize()}</span> | Licencia: <span style="color: #d97706; font-weight: 700;">{plan_activo_usuario}</span> | Creado por: Dr. Alejandro Castañeda Correa
+            </p>
+        </div>
+    </div>
+""", unsafe_allow_html=True)
+
+# --- 4. BASE DE DATOS INICIAL CON PERSISTENCIA (SESSION STATE) ---
+if "df_ingredientes_state" not in st.session_state:
+    st.session_state.df_ingredientes_state = pd.DataFrame({
+        "
