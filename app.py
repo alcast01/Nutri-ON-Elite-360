@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 
 # --- 1. CONFIGURACIÓN DE PÁGINA Y DISEÑO SaaS PROFESIONAL (CALIBRI) ---
 st.set_page_config(
-    page_title="Nutri-ON 360 ULTRA | Optimización Lineal & Red IoT México",
+    page_title="Nutri-ON 360 ULTRA | Modelo Lineal Fisiológico & Red IoT México",
     page_icon="🐄",
     layout="centered",
     initial_sidebar_state="expanded"
@@ -84,17 +84,17 @@ if "authenticated" not in st.session_state: st.session_state.authenticated = Fal
 if "current_user" not in st.session_state: st.session_state.current_user = ""
 if "nutrion_messages" not in st.session_state:
     st.session_state.nutrion_messages = [
-        {"role": "assistant", "content": "¡Hola! Soy **Nutri-ON IoT & Linear Optimizer**, tu núcleo central de formulación de dietas y telemetría ganadera. ¿Qué lote o ingrediente deseas optimizar hoy?"}
+        {"role": "assistant", "content": "¡Hola! Soy **Nutri-ON Fisiológico & Linear Optimizer**, tu núcleo central de formulación matemática y telemetría ganadera en México. ¿Qué lote o ingrediente deseas optimizar hoy?"}
     ]
 
 # --- PANTALLA DE ACCESO / SUSCRIPCIÓN CON ENFOQUE DE MARKETING ---
 if not st.session_state.authenticated:
     st.markdown("""
         <h2 style="text-align: center; color: #064e3b; font-weight: 800; margin-top: 20px;">
-            Nutri-ON <span style="color: #059669;">360</span> <span style="font-size: 0.5em; background: #059669; color: white; padding: 2px 8px; border-radius: 6px;">OPTIMIZADOR LINEAL & RED IOT</span>
+            Nutri-ON <span style="color: #059669;">360</span> <span style="font-size: 0.5em; background: #059669; color: white; padding: 2px 8px; border-radius: 6px;">MODELO FISIOLÓGICO & RED IOT</span>
         </h2>
         <p style="text-align: center; color: #059669; font-weight: 700; font-size: 0.95rem;">
-            Plataforma Profesional de Programación Lineal y Telemetría para Ganado de Engorda en México
+            Plataforma Profesional de Programación Lineal Adaptada a las Necesidades Biológicas del Ganado en México
         </p>
     """, unsafe_allow_html=True)
     
@@ -161,21 +161,20 @@ if not st.session_state.authenticated:
                 st.rerun()
     st.stop()
 
-# --- HEADER Y BARRA LATERAL CON PARÁMETROS PRODUCTIVOS OBLIGATORIOS ---
+# --- HEADER Y BARRA LATERAL CON PARÁMETROS PRODUCTIVOS & BIOLÓGICOS INTEGRALES ---
 db_activos = cargar_usuarios_persistentes()
 user_info = db_activos.get(st.session_state.current_user, {})
 plan_activo = user_info.get("plan", "Plan Nacional Elite")
 
 st.markdown(f"""
     <div style="background: linear-gradient(135deg, #ffffff 0%, #ecfdf5 100%); padding: 18px 22px; border-radius: 16px; border: 2px solid #34d399; margin-bottom: 20px;">
-        <h2 style="margin: 0; color: #064e3b; font-size: 1.5em;">🐄 Nutri-ON | Optimizador Lineal & Red IoT</h2>
+        <h2 style="margin: 0; color: #064e3b; font-size: 1.5em;">🐄 Nutri-ON | Modelo Fisiológico & Red IoT</h2>
         <p style="margin: 4px 0 0 0; color: #059669; font-weight: 600; font-size: 0.88em;">
             Usuario: <span style="color: #0f172a;">{st.session_state.current_user.capitalize()}</span> | Licencia: <span style="color: #d97706;">{plan_activo}</span>
         </p>
     </div>
 """, unsafe_allow_html=True)
 
-# Diccionario de Estados de México y perfil climático base
 estados_mexico_perfil = {
     "Aguascalientes": {"clima": "Seco / Templado", "thi_base": 72},
     "Baja California": {"clima": "Árido / Desértico", "thi_base": 76},
@@ -213,7 +212,7 @@ estados_mexico_perfil = {
 
 with st.sidebar:
     st.markdown("### ⚙️ Parámetros Productivos & Biológicos")
-    st.markdown("*Variables obligatorias para ajustar el modelo lineal de dietas.*")
+    st.markdown("*Todas estas variables calibran los requerimientos del modelo lineal.*")
     
     estado_seleccionado = st.selectbox("1. Estado de la República", list(estados_mexico_perfil.keys()), index=list(estados_mexico_perfil.keys()).index("Zacatecas"))
     perfil_estado = estados_mexico_perfil[estado_seleccionado]
@@ -258,22 +257,37 @@ if "df_ingredientes_state" not in st.session_state:
         "Max Inclusión (%)": [100.0, 100.0, 100.0, 1.5, 100.0, 100.0, 100.0, 5.0, 5.0, 5.0]
     })
 
-# --- MODELO LINEAL DE OPTIMIZACIÓN DE DIETAS AJUSTADO POR PARÁMETROS PRODUCTIVOS ---
+# --- MODELO MATEMÁTICO DE REQUERIMIENTOS FISIOLÓGICOS (INTEGRACIÓN DE LAS 15 VARIABLES) ---
 df_base = st.session_state.df_ingredientes_state
 df_base["Disponible"] = df_base["Disponible"].astype(bool)
 
-# Ajuste de Consumo de Materia Seca (CMS) basado en parámetros productivos
-factor_thi_cms = 0.93 if "Moderado" in nivel_thi else (0.83 if "Severo" in nivel_thi else 1.00)
-factor_lodo_cms = 1.00 if condicion_lodo == "Seco y Confortable" else (0.92 if "Moderado" in condicion_lodo else 0.85)
-factor_cc_cms = 0.95 if condicion_corporal > 3.5 else 1.00
+# 1. Ajustes por Clima (THI) y Estado
+thi_val = perfil_estado["thi_base"] if "Confort" in nivel_thi else (77 if "Moderado" in nivel_thi else 82)
+factor_thi_cms = 0.94 if thi_val >= 74 and thi_val < 79 else (0.85 if thi_val >= 79 else 1.00)
 
+# 2. Ajustes por Condición de Corral / Lodo
+factor_lodo_cms = 1.00 if "Seco" in condicion_lodo else (0.93 if "Moderado" in condicion_lodo else 0.87)
+factor_lodo_energia = 1.00 if "Seco" in condicion_lodo else (1.10 if "Moderado" in condicion_lodo else 1.20)
+
+# 3. Ajustes por Condición Corporal (CC) e Historial
+factor_cc_cms = 0.96 if condicion_corporal > 3.5 else (1.04 if condicion_corporal < 2.5 else 1.00)
+
+# 4. Ajustes por Sistema de Producción (Gasto Energético por Movilidad)
+factor_sistema_energia = 1.00 if "Feedlot" in sistema_produccion else (1.08 if "Semi" in sistema_produccion else 1.18)
+
+# 5. Ajustes por Genética (Raza), Sexo y Marco
+factor_raza_req = 1.06 if "Británicas" in raza_seleccionada else (1.08 if "Continentales" in raza_seleccionada else (0.94 if "Cebú" in raza_seleccionada else 1.00))
+factor_sexo_req = 1.05 if "Toros" in sexo_lote else (0.97 if "Vaquillas" in sexo_lote else 1.00)
+factor_marco_req = 1.05 if "Precoz" in marco_lote else (0.95 if "Grande" in marco_lote else 1.00)
+
+# 6. Ajuste por Aditivos (Ionóforos mejoran energía metabolizable aparente ~4%)
+factor_aditivo_energia = 1.04 if "Ionóforos" in aditivo_ruminal or "Ambos" in aditivo_ruminal else 1.00
+
+# Cálculo Final de Consumo de Materia Seca (CMS) y Requerimientos Fisiológicos Mínimos
 cms_estimado = peso_actual * 0.024 * factor_thi_cms * factor_lodo_cms * factor_cc_cms
-
-# Ajuste de requerimientos nutricionales mínimos según raza, GDE y etapa
-factor_raza_req = 1.05 if "Británicas" in raza_seleccionada else (0.95 if "Cebú" in raza_seleccionada else 1.00)
-req_pc = (0.11 + (gde * 0.02)) * factor_raza_req
-req_neg = (1.05 + (gde * 0.15)) * factor_raza_req
-req_fnd = 0.27
+req_pc = (0.115 + (gde * 0.025)) * factor_raza_req * factor_sexo_req
+req_neg = ((1.02 + (gde * 0.16)) * factor_raza_req * factor_marco_req * factor_lodo_energia * factor_sistema_energia) / factor_aditivo_energia
+req_fnd = 0.27 if "Buffer" in aditivo_ruminal or "Ambos" in aditivo_ruminal else 0.28
 
 class OptimizeResultCompat:
     def __init__(self, success, fun, x, message=""):
@@ -282,7 +296,7 @@ class OptimizeResultCompat:
         self.x = x
         self.message = message
 
-def optimizar_dieta_lineal(df, req_p, req_e, req_f):
+def optimizar_dieta_fisiologica(df, req_p, req_e, req_f):
     costos = df["Precio Estimado (MXN/ton)"].astype(float).values
     pc = df["Proteina Cruda (PC % MS)"].astype(float).values / 100.0
     neg = df["NEg (Mcal/kg)"].astype(float).values
@@ -313,16 +327,15 @@ def optimizar_dieta_lineal(df, req_p, req_e, req_f):
     
     res = linprog(costos, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
     if res.success:
-        return OptimizeResultCompat(True, res.fun, res.x, "Optimización Lineal Exitosa")
+        return OptimizeResultCompat(True, res.fun, res.x, "Optimización Fisiológica Exitosa")
     
-    # Tolerancia relajada si no hay solución estricta
-    b_ub_rel = np.array([-req_p * 0.90, -req_e * 0.90, -req_f])
+    b_ub_rel = np.array([-req_p * 0.90, -req_e * 0.90, -req_f * 0.90])
     res_rel = linprog(costos, A_ub=A_ub, b_ub=b_ub_rel, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
     if res_rel.success:
-        return OptimizeResultCompat(True, res_rel.fun, res_rel.x, "Factible con tolerancia ajustada")
+        return OptimizeResultCompat(True, res_rel.fun, res_rel.x, "Factible con tolerancia biológica ajustada")
     return OptimizeResultCompat(False, 5000.0, np.zeros(len(costos)), "Sin solución factible")
 
-resultado_opt = optimizar_dieta_lineal(df_base, req_pc, req_neg, req_fnd)
+resultado_opt = optimizar_dieta_fisiologica(df_base, req_pc, req_neg, req_fnd)
 costo_tonelada = resultado_opt.fun
 dias_a_meta = max(1.0, (peso_objetivo - peso_actual) / gde)
 costo_alimentacion_cab = (cms_estimado * dias_a_meta / 1000.0) * costo_tonelada
@@ -333,18 +346,18 @@ roi_cab = (utilidad_neta_cab / costo_total_cab) * 100 if costo_total_cab > 0 els
 
 # --- PESTAÑAS DE LA APLICACIÓN ---
 tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
-    "🥗 1. Optimizador Lineal de Dieta",
-    "🧪 2. Ingredientes y Precios",
-    "📊 3. Economía y Rentabilidad",
+    "🥗 1. Dieta Óptima Fisiológica",
+    "🧪 2. Banco de Ingredientes",
+    "📊 3. Economía y Lote",
     "📡 4. Dashboard Red IoT",
-    "🌡️ 5. Bolos Ruminales & Sensores",
+    "🌡️ 5. Bolos Ruminales (pH)",
     "🚜 6. Básculas & Mezcladora",
     "💬 7. Nutri-ON Bot"
 ])
 
 with tab1:
-    st.subheader(f"Formulación Óptima de Dieta ({estado_seleccionado})")
-    st.markdown(f"**Parámetros Activos:** Raza: `{raza_seleccionada}` | GDE Meta: `{gde} kg/día` | CMS Estimado: `{cms_estimado:.2f} kg/día`")
+    st.subheader(f"Formulación Ajustada a Necesidades Fisiológicas ({estado_seleccionado})")
+    st.markdown(f"**Perfil Biológico:** Raza: `{raza_seleccionada}` | Sexo: `{sexo_lote}` | Marco: `{marco_lote}` | Sistema: `{sistema_produccion}`\n* **CMS Fisiológico:** `{cms_estimado:.2f} kg/día` | **Req. PC Mínimo:** `{req_pc*100:.2f}%` | **Req. NEg Mínimo:** `{req_neg:.2f} Mcal/kg`")
     
     if resultado_opt.success:
         df_resultado = df_base.copy()
@@ -360,15 +373,15 @@ with tab1:
         with col_res2:
             st.metric("Costo Diario por Cabeza", f"${(cms_estimado / 1000.0) * costo_tonelada:,.2f} MXN")
         with col_res3:
-            st.metric("Estatus del Solver Lineal", f"🟢 {resultado_opt.message}")
+            st.metric("Estatus del Solver", f"🟢 {resultado_opt.message}")
     else:
-        st.error("No se encontró solución factible con las restricciones actuales. Ajusta los precios o límites de inclusión en la pestaña 2.")
+        st.error("No se encontró solución factible. Revisa los precios o los límites de inclusión en la pestaña 2.")
 
 with tab2:
-    st.subheader("🧪 Banco de Ingredientes y Restricciones de Inclusión")
-    st.markdown("Modifica los precios y límites mínimos/máximos de los ingredientes disponibles en tu región.")
+    st.subheader("🧪 Banco de Ingredientes y Restricciones Regionales")
+    st.markdown("Personaliza los precios y límites mínimos/máximos de inclusión para el modelo lineal.")
     st.session_state.df_ingredientes_state = st.data_editor(
-        st.session_state.df_ingredientes_state, num_rows="dynamic", use_container_width=True, key="editor_ingredientes_lineal"
+        st.session_state.df_ingredientes_state, num_rows="dynamic", use_container_width=True, key="editor_ingredientes_fisiologico"
     )
 
 with tab3:
@@ -413,7 +426,7 @@ with tab6:
     st.subheader("🚜 Básculas IoT para Carros Mezcladores")
     st.info(
         "🔗 **Estado de Conectividad Báscula #1:** Conectado vía Bluetooth Low Energy (BLE)\n\n"
-        f"* **Ración Óptima Formulatada:** {raza_seleccionada}\n"
+        f"* **Ración Óptima Formulatada:** {raza_seleccionada} ({sexo_lote})\n"
         f"* **Costo Tonelada Optimizado:** `${costo_tonelada:,.2f} MXN`\n"
         "* **Precisión de Carga en Batea:** `99.5%` (🟢 Tolerancia OK)"
     )
@@ -426,6 +439,6 @@ with tab7:
     if q := st.chat_input("Pregúntale al sistema sobre la dieta o la red IoT..."):
         st.session_state.nutrion_messages.append({"role": "user", "content": q})
         with st.chat_message("user"): st.markdown(q)
-        ans = f"🤖 **Respuesta Nutri-ON ({estado_seleccionado}):** Analizando tu lote de {cantidad_animales} cabezas con el modelo lineal y telemetría, la dieta actual está optimizada a un costo de ${costo_tonelada:,.2f} MXN/ton con una GDE de {gde} kg/día. ¿Deseas exportar la orden de carga para el carro mezclador?"
+        ans = f"🤖 **Respuesta Nutri-ON ({estado_seleccionado}):** Analizando tu lote de {cantidad_animales} cabezas bajo el modelo fisiológico para {raza_seleccionada} ({sexo_lote}), la dieta está optimizada a un costo de ${costo_tonelada:,.2f} MXN/ton con un CMS ajustado de {cms_estimado:.2f} kg/día. ¿Deseas exportar la orden de carga para el carro mezclador?"
         st.session_state.nutrion_messages.append({"role": "assistant", "content": ans})
         with st.chat_message("assistant"): st.markdown(ans)
