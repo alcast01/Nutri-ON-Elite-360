@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 
 # --- 1. CONFIGURACIÓN DE PÁGINA Y DISEÑO SaaS PROFESIONAL (CALIBRI & UI/UX) ---
 st.set_page_config(
-    page_title="Nitri-ON 360 ULTRA V1.0 IA & IoT | Precisión Nutricional y Collares",
+    page_title="Nutri-ON 360 ULTRA V1.0 IA & IoT | Precisión Nutricional y Collares",
     page_icon="🐄",
     layout="centered",
     initial_sidebar_state="expanded"
@@ -122,7 +122,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- 2. GESTIÓN DE MULTI-USUARIOS, PERSISTENCIA Y RENOVACIÓN AUTOMÁTICA ---
-USERS_FILE = "usuarios_nitrion_360.json"
+USERS_FILE = "usuarios_nutrion_360_v1.json"
 
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
@@ -137,7 +137,7 @@ def cargar_usuarios_persistentes():
     default_users = {
         "admin": {
             "password": hash_password("1234"),
-            "email": "admin@nitrion360.com",
+            "email": "admin@nutrion360.com",
             "subscription_active": True,
             "plan": "Anual Ultra AI & IoT (12 Meses) - $9,600 MXN | $800.00/mes",
             "auto_renew": True,
@@ -146,7 +146,7 @@ def cargar_usuarios_persistentes():
         },
         "alejandro": {
             "password": hash_password("elite360"),
-            "email": "alejandro.castaneda@nitrion360.com",
+            "email": "alejandro.castaneda@nutrion360.com",
             "subscription_active": True,
             "plan": "Anual Ultra AI & IoT (12 Meses) - $9,600 MXN | $800.00/mes",
             "auto_renew": True,
@@ -167,9 +167,9 @@ if "authenticated" not in st.session_state:
 if "current_user" not in st.session_state:
     st.session_state.current_user = ""
 
-if "nitrion_messages" not in st.session_state:
-    st.session_state.nitrion_messages = [
-        {"role": "assistant", "content": "¡Hola! Soy **Nitri-ON**, tu consultor experto en nutrición y engorda bovina. Estoy conectado con tus datos de lote (sensores NIR, collares IoT y el motor de optimización). ¿Qué problema o desafío tienes hoy en el rancho? (Ej: *'mis becerros bajaron el consumo'*, *'el costo del alimento está muy alto'* o *'tengo sospecha de acidosis'*)."}
+if "nutrion_messages" not in st.session_state:
+    st.session_state.nutrion_messages = [
+        {"role": "assistant", "content": "¡Hola! Soy **Nutri-ON**, tu consultor experto en nutrición y engorda bovina. Estoy conectado con tus datos de lote (sensores NIR, collares IoT y el motor de optimización). ¿Qué problema o desafío tienes hoy en el rancho? (Ej: *'mis becerros bajaron el consumo'*, *'el costo del alimento está muy alto'* o *'tengo sospecha de acidosis'*)."}
     ]
 
 # --- PANTALLA DE ACCESO / SUSCRIPCIÓN SI NO ESTÁ AUTENTICADO ---
@@ -196,7 +196,7 @@ if not st.session_state.authenticated:
             </div>
         </div>
         <h2 style="text-align: center; color: #064e3b; font-family: 'Calibri', sans-serif; font-weight: 800; margin-bottom: 2px;">
-            Nitri-ON <span style="color: #059669;">360</span> <span style="font-size: 0.5em; background: #059669; color: white; padding: 2px 8px; border-radius: 6px; vertical-align: middle;">ULTRA V1.0 IA & IOT</span>
+            Nutri-ON <span style="color: #059669;">360</span> <span style="font-size: 0.5em; background: #059669; color: white; padding: 2px 8px; border-radius: 6px; vertical-align: middle;">ULTRA V1.0 IA & IOT</span>
         </h2>
         <p style="text-align: center; color: #059669; font-family: 'Calibri', sans-serif; font-weight: 700; font-size: 0.95rem; margin-bottom: 8px;">
             Nutrición de precisión, programación lineal avanzada, collares IoT y salud animal.
@@ -234,7 +234,7 @@ if not st.session_state.authenticated:
         st.markdown("Elige el periodo de suscripción con acceso total a sensores NIR, collares IoT y motor de precisión:")
         
         plan_elegido = st.radio(
-            "Planes de Suscripción Nitri-ON 360 Disponibles:",
+            "Planes de Suscripción Nutri-ON 360 Disponibles:",
             [
                 "Trimestral Pro AI (3 Meses) - $3,000 MXN | $1,000.00/mes",
                 "Semestral Feedlot IoT (6 Meses) - $5,400 MXN | $900.00/mes",
@@ -344,7 +344,7 @@ st.markdown("""
         </div>
         <div style="flex-grow: 1; min-width: 240px;">
             <h1 style="margin: 0; font-size: 1.8em; color: #064e3b; letter-spacing: -0.8px; font-weight: 800; font-family: 'Calibri', sans-serif;">
-                Nitri-ON <span style="background: linear-gradient(135deg, #059669, #10b981); color: #ffffff; padding: 3px 10px; border-radius: 8px; font-size: 0.5em; vertical-align: middle; font-weight: 700; letter-spacing: 0.8px; box-shadow: 0 4px 10px rgba(5,150,105,0.3);">360 ULTRA V1.0 IA & IOT</span>
+                Nutri-ON <span style="background: linear-gradient(135deg, #059669, #10b981); color: #ffffff; padding: 3px 10px; border-radius: 8px; font-size: 0.5em; vertical-align: middle; font-weight: 700; letter-spacing: 0.8px; box-shadow: 0 4px 10px rgba(5,150,105,0.3);">360 ULTRA V1.0 IA & IOT</span>
             </h1>
             <p style="margin: 2px 0 2px 0; font-size: 0.82em; color: #059669; font-weight: 700; font-family: 'Calibri', sans-serif;">
                 Optimización lineal de precisión, sensores NIR, collares IoT y salud animal en tiempo real.
@@ -416,8 +416,8 @@ if "df_collares_state" not in st.session_state:
         ]
     })
 
-# --- 5. BARRA LATERAL (TÍTULOS LIMPIOS Y LIBRES DE ARTEFACTOS) ---
-st.sidebar.markdown(f"### 🎛️ Panel Ultra AI Nitri-ON")
+# --- 5. BARRA LATERAL ---
+st.sidebar.markdown(f"### 🎛️ Panel Ultra AI Nutri-ON")
 st.sidebar.markdown(f"👤 **Usuario:** {st.session_state.current_user.capitalize()}")
 st.sidebar.markdown(f"🛡️ **Licencia:** {plan_activo_usuario}")
 
@@ -820,7 +820,7 @@ class PDFReport(FPDF):
     def header(self):
         self.set_font('Arial', 'B', 12)
         self.set_text_color(5, 150, 105)
-        self.cell(0, 10, 'Nitri-ON 360 ULTRA V1.0 IA & IoT - Creado por Dr. Alejandro Castaneda Correa', 0, 1, 'C')
+        self.cell(0, 10, 'Nutri-ON 360 ULTRA V1.0 IA & IoT - Creado por Dr. Alejandro Castaneda Correa', 0, 1, 'C')
         self.ln(3)
 
     def footer(self):
@@ -913,7 +913,7 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10, tab11, tab12 = st.t
     "🚜 5. Báscula",
     "🔮 6. Compra-Venta",
     "📄 7. Reporte PDF",
-    "💬 8. Nitri-ON IA",
+    "💬 8. Nutri-ON IA",
     "🧭 9. Citas",
     "📡 10. NIR & pH Ruminal",
     "🎙️ 11. IA Acústica & Visión",
@@ -994,7 +994,7 @@ with tab3:
     
     if resultado.success:
         if modo_tolerancia_activo:
-            st.warning("⚠️ **Aviso de Auto-Recuperación Nitri-ON:** El sistema ajustó automáticamente los márgenes de tolerancia de minerales y energía.")
+            st.warning("⚠️ **Aviso de Auto-Recuperación Nutri-ON:** El sistema ajustó automáticamente los márgenes de tolerancia de minerales y energía.")
         
         consumo_total_ciclo_cab = cms_estimado * dias_a_meta
         costo_alimentacion_cab = (consumo_total_ciclo_cab / 1000.0) * costo_ton_optimizado
@@ -1025,7 +1025,7 @@ with tab3:
         st.markdown("---")
         st.markdown("#### 📈 Monitor de Mercados de Futuros (CBOT) y Cobertura de Costos:")
         st.info(
-            "💡 **Recomendación Hedging Nitri-ON 360:** Basado en tu consumo proyectado de **"
+            "💡 **Recomendación Hedging Nutri-ON 360:** Basado en tu consumo proyectado de **"
             f"{(consumo_total_ciclo_cab * cantidad_animales) / 1000.0:,.1f} toneladas** de alimento, "
             "el mercado de granos presenta estabilidad en contratos a 3 meses. Considera asegurar un 50% de tus requerimientos de maíz."
         )
@@ -1097,7 +1097,7 @@ with tab4:
     st.markdown("""
         **Inteligencia Artificial aplicada al Comportamiento Animal:** Los collares IoT integrados monitorean 
         los movimientos de masticación (minutos de rumia diarios) y las visitas al comedero en tiempo real. 
-        Si un animal reduce drásticamente su actividad o ausentismo en comederos, **Nitri-ON 360 ULTRA** 
+        Si un animal reduce drásticamente su actividad o ausentismo en comederos, **Nutri-ON 360 ULTRA** 
         envía una notificación instantánea al teléfono celular del productor para aislarlo, tratarlo o descartarlo.
     """)
     
@@ -1149,7 +1149,7 @@ with tab4:
                         remitente = tw_remitente
                         destino = telefono_productor
                         
-                    mensaje_alerta = "⚠️ Alerta Nitri-ON Ultra: Animal #1014 muestra caída del 52% en rumia y 0 visitas al comedero. Posible BRD o acidosis. Aislar de inmediato."
+                    mensaje_alerta = "⚠️ Alerta Nutri-ON Ultra: Animal #1014 muestra caída del 52% en rumia y 0 visitas al comedero. Posible BRD o acidosis. Aislar de inmediato."
                     
                     message = client.messages.create(
                         body=mensaje_alerta,
@@ -1267,7 +1267,7 @@ with tab7:
         st.download_button(
             label="📥 Descargar Reporte Ejecutivo Ultra en PDF",
             data=pdf_bytes,
-            file_name="Nitri-ON_360_ULTRA_Reporte.pdf",
+            file_name="Nutri-ON_360_ULTRA_Reporte.pdf",
             mime="application/pdf",
             use_container_width=True
         )
@@ -1276,7 +1276,7 @@ with tab7:
         st.warning("⚠️ Resuelve las restricciones nutricionales para habilitar la descarga.")
 
 with tab8:
-    st.subheader("💬 Asistente Virtual Experto en Engorda (Nitri-ON IA)")
+    st.subheader("💬 Asistente Virtual Experto en Engorda (Nutri-ON IA)")
     st.markdown(
         "🧠 **Consultor Inteligente de Rumiantes:** Este asistente analiza tus parámetros actuales de lote "
         f"(*{cantidad_animales} cabezas | {peso_actual} kg | Fase: {fase} | GDE: {gde} kg/d*) "
@@ -1285,20 +1285,19 @@ with tab8:
     
     chat_container = st.container()
     with chat_container:
-        for message in st.session_state.nitrion_messages:
+        for message in st.session_state.nutrion_messages:
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
 
     if user_query := st.chat_input("Escribe tu problema o pregunta sobre la engorda (ej. 'mis becerros no comen', 'cómo bajo costo de ración')..."):
-        st.session_state.nitrion_messages.append({"role": "user", "content": user_query})
+        st.session_state.nutrion_messages.append({"role": "user", "content": user_query})
         with st.chat_message("user"):
             st.markdown(user_query)
         
-        # --- MOTOR DE ASISTENCIA EXPERTA CONVERSACIONAL ---
         q_lower = user_query.lower()
         if any(w in q_lower for w in ["costo", "caro", "precio", "ingrediente", "barato", "gastar"]):
             bot_response = (
-                f"📊 **Análisis de Costos Nitri-ON AI:** Tu costo actual de fórmula optimizada es de **${costo_ton_optimizado:,.2f} MXN por tonelada**, "
+                f"📊 **Análisis de Costos Nutri-ON AI:** Tu costo actual de fórmula optimizada es de **${costo_ton_optimizado:,.2f} MXN por tonelada**, "
                 f"lo que representa un costo de alimentación por cabeza en el ciclo de **${costo_alimentacion_cab:,.2f} MXN**.\n\n"
                 "Para optimizar esto:\n"
                 "1. Revisa la pestaña de **Nutrición (Tab 2)** para activar o desactivar ingredientes regionales.\n"
@@ -1334,13 +1333,13 @@ with tab8:
             )
         else:
             bot_response = (
-                f"🤖 Entiendo tu consulta sobre *\"{user_query}\"*. Como tu consultor experto en **Nitri-ON 360 ULTRA**, "
+                f"🤖 Entiendo tu consulta sobre *\"{user_query}\"*. Como tu consultor experto en **Nutri-ON 360 ULTRA V1.0 IA & IoT**, "
                 f"estoy evaluando tu lote de **{cantidad_animales} cabezas** ({peso_actual} kg actuales, meta de {peso_objetivo} kg).\n\n"
                 "Para darte la mejor solución técnica, ¿te enfocas más en mejorar la **eficiencia alimenticia**, "
                 "controlar la **sanidad del corral** o ajustar la **rentabilidad del ciclo de venta**?"
             )
             
-        st.session_state.nitrion_messages.append({"role": "assistant", "content": bot_response})
+        st.session_state.nutrion_messages.append({"role": "assistant", "content": bot_response})
         with st.chat_message("assistant"):
             st.markdown(bot_response)
 
@@ -1490,7 +1489,7 @@ with tab12:
     with col_gt2:
         st.markdown("#### ⛓️ Certificación y Auditoría Blockchain (Bonos de Carbono)")
         st.info(
-            "🔒 **Bloque Registrado en Red Inmutable (Nitri-ON Chain):**\n\n"
+            "🔒 **Bloque Registrado en Red Inmutable (Nutri-ON Chain):**\n\n"
             f"* **Hash de Transacción:** `0x4f8a9c2...b19e3d7`\n"
             f"* **Lote Auditado:** {cantidad_animales} cabezas | Estándar IPCC Tier 2\n"
             f"* **Reducción Certificada de CO2e:** `{co2e_anual * cantidad_animales / 1000.0:,.2f} toneladas/año`\n"
