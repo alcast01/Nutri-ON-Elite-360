@@ -416,7 +416,7 @@ if "df_collares_state" not in st.session_state:
         ]
     })
 
-# --- 5. BARRA LATERAL (CON EXPANDERS LIMPIOS Y SIN TEXTO EMPALMADO) ---
+# --- 5. BARRA LATERAL (TÍTULOS LIMPIOS Y LIBRES DE ARTEFACTOS) ---
 st.sidebar.markdown(f"### 🎛️ Panel Ultra AI NutriON")
 st.sidebar.markdown(f"👤 **Usuario:** {st.session_state.current_user.capitalize()}")
 st.sidebar.markdown(f"🛡️ **Licencia:** {plan_activo_usuario}")
@@ -1163,7 +1163,7 @@ with tab4:
                 except Exception as e:
                     st.error(f"❌ Error al conectar con Twilio: {e}")
             else:
-                st.success(f"📱 **¡Alerta Push Enviada a {telefono_productor}!** (Modo Simulador)")
+                st.success(f"📱 **¡Alerta Push Enviar a {telefono_productor}!** (Modo Simulador)")
                 st.balloons()
         else:
             st.warning("⚠️ Ingresa un número de celular válido con código de país.")
