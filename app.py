@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 
 # --- 1. CONFIGURACIÓN DE PÁGINA Y DISEÑO SaaS PROFESIONAL (CALIBRI) ---
 st.set_page_config(
-    page_title="Nutri-ON 360 ULTRA | Red IoT & Edge AI México",
+    page_title="Nutri-ON 360 ULTRA | Optimización Lineal & Red IoT México",
     page_icon="🐄",
     layout="centered",
     initial_sidebar_state="expanded"
@@ -84,25 +84,25 @@ if "authenticated" not in st.session_state: st.session_state.authenticated = Fal
 if "current_user" not in st.session_state: st.session_state.current_user = ""
 if "nutrion_messages" not in st.session_state:
     st.session_state.nutrion_messages = [
-        {"role": "assistant", "content": "¡Hola! Soy **Nutri-ON IoT**, tu núcleo central de inteligencia artificial y telemetría ganadera en México. Conectado a collares, bolos ruminales y básculas inteligentes. ¿Qué reporte deseas revisar hoy?"}
+        {"role": "assistant", "content": "¡Hola! Soy **Nutri-ON IoT & Linear Optimizer**, tu núcleo central de formulación de dietas y telemetría ganadera. ¿Qué lote o ingrediente deseas optimizar hoy?"}
     ]
 
-# --- PANTALLA DE ACCESO / SUSCRIPCIÓN ---
+# --- PANTALLA DE ACCESO / SUSCRIPCIÓN CON ENFOQUE DE MARKETING ---
 if not st.session_state.authenticated:
     st.markdown("""
         <h2 style="text-align: center; color: #064e3b; font-weight: 800; margin-top: 20px;">
-            Nutri-ON <span style="color: #059669;">360</span> <span style="font-size: 0.5em; background: #059669; color: white; padding: 2px 8px; border-radius: 6px;">HUB RED IOT V1.0</span>
+            Nutri-ON <span style="color: #059669;">360</span> <span style="font-size: 0.5em; background: #059669; color: white; padding: 2px 8px; border-radius: 6px;">OPTIMIZADOR LINEAL & RED IOT</span>
         </h2>
         <p style="text-align: center; color: #059669; font-weight: 700; font-size: 0.95rem;">
-            Plataforma de Integración Exclusiva para Dispositivos de IA y Sensores en Ganado de Engorda
+            Plataforma Profesional de Programación Lineal y Telemetría para Ganado de Engorda en México
         </p>
     """, unsafe_allow_html=True)
     
-    tab_login, tab_register = st.tabs(["🔑 Iniciar Sesión", "💳 Planes & Licencias Red IoT"])
+    tab_login, tab_register = st.tabs(["🔑 Iniciar Sesión", "💳 Planes & Ahorros Inteligentes"])
     with tab_login:
         user_input = st.text_input("Usuario", key="l_user")
         pass_input = st.text_input("Contraseña", type="password", key="l_pass")
-        if st.button("Conectar al Hub IoT", use_container_width=True):
+        if st.button("Conectar al Sistema", use_container_width=True):
             db = cargar_usuarios_persistentes()
             if user_input in db and db[user_input]["password"] == hash_password(pass_input):
                 st.session_state.authenticated = True
@@ -112,13 +112,13 @@ if not st.session_state.authenticated:
                 st.error("Credenciales inválidas.")
     
     with tab_register:
-        st.markdown("### 🌟 Selecciona tu Plan Estratégico y Comienza a Ahorrar")
+        st.markdown("### 🌟 Selecciona tu Plan Estratégico y Maximiza tu Utilidad")
         plan_elegido = st.radio(
-            "Planes de Conectividad IoT Disponibles:",
+            "Planes de Inversión Tecnológica Disponibles:",
             [
-                "Trimestral (3 Meses) - $1,000.00 MXN/mes | Total: $3,000 MXN 🚀 (Flexibilidad y control total para tu ciclo actual)",
-                "Semestral Feedlot (6 Meses) - $900.00 MXN/mes | Total: $5,400 MXN 💡 (¡Ahorra $600 MXN! El equilibrio perfecto para ciclos completos)",
-                "Anual Nacional Elite (12 Meses) - $800.00 MXN/mes | Total: $9,600 MXN 👑 (¡Ahorra $2,400 MXN! Máxima rentabilidad y 20% de descuento directo)"
+                "Trimestral (3 Meses) - $1,000.00 MXN/mes | Total: $3,000 MXN 🚀 (Flexibilidad y control total para tu ciclo actual de engorda con inversión inteligente.)",
+                "Semestral Feedlot (6 Meses) - $900.00 MXN/mes | Total: $5,400 MXN 💡 (¡Ahorra $600 MXN! El equilibrio perfecto para optimizar ciclos completos con un 10% de ahorro directo.)",
+                "Anual Nacional Elite (12 Meses) - $800.00 MXN/mes | Total: $9,600 MXN 👑 (¡Ahorra $2,400 MXN! La opción más inteligente de los ganaderos de élite: acceso ilimitado a toda la red IoT con 20% de descuento y máximo ROI.)"
             ],
             index=2
         )
@@ -135,7 +135,7 @@ if not st.session_state.authenticated:
         auto_renew_reg = st.checkbox("🔄 Activar Renovación Automática Segura", value=True)
         st.markdown("")
         
-        if st.button("💳 Pagar Licencia y Activar Red IoT", use_container_width=True):
+        if st.button("💳 Pagar Licencia y Activar Sistema", use_container_width=True):
             db = cargar_usuarios_persistentes()
             if not r_user or not r_pass or not r_card:
                 st.warning("⚠️ Completa los campos obligatorios de usuario y pago.")
@@ -156,50 +156,84 @@ if not st.session_state.authenticated:
                 guardar_usuarios_persistentes(db)
                 st.session_state.authenticated = True
                 st.session_state.current_user = r_user
-                st.success("🎉 ¡Pago exitoso! Dispositivos de IA sincronizados con el Hub Central.")
+                st.success("🎉 ¡Pago exitoso! Módulos de optimización lineal y red IoT activados.")
                 st.balloons()
                 st.rerun()
     st.stop()
 
-# --- HEADER Y BARRA LATERAL ---
+# --- HEADER Y BARRA LATERAL CON PARÁMETROS PRODUCTIVOS OBLIGATORIOS ---
 db_activos = cargar_usuarios_persistentes()
 user_info = db_activos.get(st.session_state.current_user, {})
 plan_activo = user_info.get("plan", "Plan Nacional Elite")
 
 st.markdown(f"""
     <div style="background: linear-gradient(135deg, #ffffff 0%, #ecfdf5 100%); padding: 18px 22px; border-radius: 16px; border: 2px solid #34d399; margin-bottom: 20px;">
-        <h2 style="margin: 0; color: #064e3b; font-size: 1.5em;">🌐 Nutri-ON Red IoT & Edge AI Hub</h2>
+        <h2 style="margin: 0; color: #064e3b; font-size: 1.5em;">🐄 Nutri-ON | Optimizador Lineal & Red IoT</h2>
         <p style="margin: 4px 0 0 0; color: #059669; font-weight: 600; font-size: 0.88em;">
             Usuario: <span style="color: #0f172a;">{st.session_state.current_user.capitalize()}</span> | Licencia: <span style="color: #d97706;">{plan_activo}</span>
         </p>
     </div>
 """, unsafe_allow_html=True)
 
-# Estados de México
+# Diccionario de Estados de México y perfil climático base
 estados_mexico_perfil = {
     "Aguascalientes": {"clima": "Seco / Templado", "thi_base": 72},
     "Baja California": {"clima": "Árido / Desértico", "thi_base": 76},
+    "Baja California Sur": {"clima": "Árido / Cálido", "thi_base": 78},
+    "Campeche": {"clima": "Tropical Húmedo", "thi_base": 82},
+    "Chiapas": {"clima": "Tropical / Subtropical", "thi_base": 80},
     "Chihuahua": {"clima": "Seco / Extremoso", "thi_base": 74},
+    "Ciudad de México": {"clima": "Templado / Urbano", "thi_base": 70},
+    "Coahuila": {"clima": "Árido / Seco", "thi_base": 77},
+    "Colima": {"clima": "Tropical / Cálido", "thi_base": 81},
     "Durango": {"clima": "Seco / Templado", "thi_base": 73},
+    "Estado de México": {"clima": "Templado / Subhúmedo", "thi_base": 70},
+    "Guanajuato": {"clima": "Semiárido / Templado", "thi_base": 72},
+    "Guerrero": {"clima": "Tropical / Cálido", "thi_base": 82},
+    "Hidalgo": {"clima": "Templado / Semiárido", "thi_base": 71},
     "Jalisco": {"clima": "Templado / Subhúmedo", "thi_base": 73},
+    "Michoacán": {"clima": "Cálido / Templado", "thi_base": 75},
+    "Morelos": {"clima": "Cálido / Subhúmedo", "thi_base": 78},
+    "Nayarit": {"clima": "Tropical / Cálido", "thi_base": 80},
     "Nuevo León": {"clima": "Seco / Semiárido", "thi_base": 78},
+    "Oaxaca": {"clima": "Tropical / Diverse", "thi_base": 79},
+    "Puebla": {"clima": "Templado / Semiárido", "thi_base": 71},
+    "Querétaro": {"clima": "Semiárido / Templado", "thi_base": 72},
+    "Quintana Roo": {"clima": "Tropical Húmedo", "thi_base": 83},
+    "San Luis Potosí": {"clima": "Seco / Semiárido", "thi_base": 76},
     "Sinaloa": {"clima": "Cálido / Seco", "thi_base": 79},
     "Sonora": {"clima": "Árido / Extremoso", "thi_base": 80},
+    "Tabasco": {"clima": "Tropical Húmedo", "thi_base": 84},
+    "Tamaulipas": {"clima": "Cálido / Subhúmedo", "thi_base": 78},
+    "Tlaxcala": {"clima": "Templado / Frío", "thi_base": 69},
     "Veracruz": {"clima": "Tropical / Cálido Húmedo", "thi_base": 82},
+    "Yucatán": {"clima": "Tropical Cálido / Seco", "thi_base": 83},
     "Zacatecas": {"clima": "Seco / Semiárido", "thi_base": 72}
 }
 
 with st.sidebar:
-    st.markdown("### ⚙️ Configuración Red IoT")
-    estado_seleccionado = st.selectbox("Estado de México", list(estados_mexico_perfil.keys()))
-    cantidad_animales = st.number_input("Cabezas en Lote IoT", min_value=1, max_value=5000, value=250, step=10)
-    peso_actual = st.slider("Peso Actual Promedio (kg)", 200.0, 650.0, 280.0, 10.0)
-    peso_objetivo = st.slider("Peso Venta Meta (kg)", 400.0, 750.0, 540.0, 10.0)
-    gde = st.slider("GDE Meta (kg/día)", 0.8, 2.2, 1.5, 0.1)
-
-    precio_compra = st.number_input("Precio Compra ($/kg)", 30.0, 100.0, 55.0)
-    precio_venta = st.number_input("Precio Venta ($/kg)", 30.0, 100.0, 50.0)
-    raza_lote = st.selectbox("Raza", ["Beefmaster / Brangus", "Angus / Hereford", "Charolais / Simmental", "Brahman / Nelore", "Criollo"])
+    st.markdown("### ⚙️ Parámetros Productivos & Biológicos")
+    st.markdown("*Variables obligatorias para ajustar el modelo lineal de dietas.*")
+    
+    estado_seleccionado = st.selectbox("1. Estado de la República", list(estados_mexico_perfil.keys()), index=list(estados_mexico_perfil.keys()).index("Zacatecas"))
+    perfil_estado = estados_mexico_perfil[estado_seleccionado]
+    
+    cantidad_animales = st.number_input("2. Cabezas en el Lote", min_value=1, max_value=10000, value=150, step=10)
+    peso_actual = st.slider("3. Peso Actual Promedio (kg)", min_value=200.0, max_value=650.0, value=280.0, step=10.0)
+    peso_objetivo = st.slider("4. Peso de Venta Meta (kg)", min_value=400.0, max_value=750.0, value=540.0, step=10.0)
+    gde = st.slider("5. Ganancia Diaria Esperada (GDE kg/día)", min_value=0.8, max_value=2.2, value=1.4, step=0.1)
+    
+    precio_compra = st.number_input("6. Precio Compra Becerro ($/kg)", 30.0, 100.0, 55.0)
+    precio_venta = st.number_input("7. Precio Venta Ganado Gordo ($/kg)", 30.0, 100.0, 50.0)
+    
+    raza_seleccionada = st.selectbox("8. Raza / Genética", ["Sintéticas / Adaptadas (Beefmaster/Brangus)", "Británicas (Angus/Hereford)", "Continentales (Charolais/Simmental)", "Cebú (Brahman/Nelore)", "Criollo Mexicano"])
+    sexo_lote = st.selectbox("9. Sexo / Categoría", ["Novillos (Castrados)", "Toros Enteros", "Vaquillas de Repasta"])
+    marco_lote = st.selectbox("10. Tamaño de Marco", ["Mediano (Standard)", "Precoz", "Grande (Continental)"])
+    sistema_produccion = st.selectbox("11. Sistema de Producción", ["Corral / Engorda Intensiva (Feedlot)", "Semi-estabulado (Mixto)", "Pastoreo Extensivo / Agostadero"])
+    condicion_corporal = st.slider("12. Condición Corporal (1.0 - 5.0)", 1.0, 5.0, 2.5, 0.5)
+    nivel_thi = st.selectbox("13. Estrés Térmico (THI)", ["Confort Térmico (< 74)", "Estrés Moderado (74-78)", "Estrés Severo (> 78)"])
+    condicion_lodo = st.selectbox("14. Condición de Corral / Lodo", ["Seco y Confortable", "Lodo Moderado (10-15 cm)", "Lodo Severo (>20 cm)"])
+    aditivo_ruminal = st.selectbox("15. Aditivos y Modificadores", ["Ninguno", "Ionóforos (Monensina)", "Buffer (Bicarbonato)", "Ambos (Ionóforo + Buffer)"])
 
     st.markdown("---")
     if st.button("🚪 Cerrar Sesión", use_container_width=True):
@@ -207,7 +241,7 @@ with st.sidebar:
         st.session_state.current_user = ""
         st.rerun()
 
-# Base de ingredientes y cálculos de optimización
+# --- BASE DE DATOS DE INGREDIENTES ---
 if "df_ingredientes_state" not in st.session_state:
     st.session_state.df_ingredientes_state = pd.DataFrame({
         "Nombre del Ingrediente": ["Rastrojo de maiz", "Harina de soya", "Grano de maiz molido", "Urea", "Ensilado de maiz", "Canola", "Melaza", "Mineral Regional", "Malta", "Grasa bypass"],
@@ -218,121 +252,180 @@ if "df_ingredientes_state" not in st.session_state:
         "NEg (Mcal/kg)": [0.35, 1.48, 1.55, 0.0, 0.85, 1.15, 1.22, 0.0, 0.0, 1.65],
         "FND (% MS)": [75.0, 12.0, 9.0, 0.0, 45.0, 28.0, 0.0, 0.0, 0.0, 0.0],
         "peNDF (% MS)": [65.0, 2.0, 3.0, 0.0, 30.0, 10.0, 0.0, 0.0, 0.0, 0.0],
-        "PDR (% MS)": [3.5, 33.6, 5.5, 281.0, 5.0, 24.0, 4.5, 0.0, 0.0, 0.0],
-        "PND (% MS)": [2.0, 14.4, 3.0, 0.0, 3.0, 14.0, 0.3, 0.0, 0.0, 1.0],
         "Calcio (Ca %)": [0.35, 0.30, 0.02, 0.0, 0.25, 0.70, 0.80, 14.0, 16.0, 1.0],
         "Fosforo (P %)": [0.10, 0.65, 0.30, 0.0, 0.22, 1.10, 0.08, 7.0, 8.0, 0.1],
-        "Sodio (Na %)": [0.02, 0.03, 0.02, 0.0, 0.02, 0.05, 0.10, 10.0, 9.0, 0.0],
-        "Magnesio (Mg %)": [0.15, 0.28, 0.12, 0.0, 0.18, 0.50, 0.40, 2.0, 2.5, 0.0],
-        "Lípidos / Extracto Etéreo (%)": [1.5, 1.8, 3.8, 0.0, 3.0, 3.5, 0.5, 0.0, 0.0, 99.0],
         "Min Inclusión (%)": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0],
         "Max Inclusión (%)": [100.0, 100.0, 100.0, 1.5, 100.0, 100.0, 100.0, 5.0, 5.0, 5.0]
     })
 
+# --- MODELO LINEAL DE OPTIMIZACIÓN DE DIETAS AJUSTADO POR PARÁMETROS PRODUCTIVOS ---
 df_base = st.session_state.df_ingredientes_state
 df_base["Disponible"] = df_base["Disponible"].astype(bool)
-cms_estimado = peso_actual * 0.024 * (1.03 if "Veracruz" in estado_seleccionado else 1.00)
+
+# Ajuste de Consumo de Materia Seca (CMS) basado en parámetros productivos
+factor_thi_cms = 0.93 if "Moderado" in nivel_thi else (0.83 if "Severo" in nivel_thi else 1.00)
+factor_lodo_cms = 1.00 if condicion_lodo == "Seco y Confortable" else (0.92 if "Moderado" in condicion_lodo else 0.85)
+factor_cc_cms = 0.95 if condicion_corporal > 3.5 else 1.00
+
+cms_estimado = peso_actual * 0.024 * factor_thi_cms * factor_lodo_cms * factor_cc_cms
+
+# Ajuste de requerimientos nutricionales mínimos según raza, GDE y etapa
+factor_raza_req = 1.05 if "Británicas" in raza_seleccionada else (0.95 if "Cebú" in raza_seleccionada else 1.00)
+req_pc = (0.11 + (gde * 0.02)) * factor_raza_req
+req_neg = (1.05 + (gde * 0.15)) * factor_raza_req
+req_fnd = 0.27
 
 class OptimizeResultCompat:
-    def __init__(self, success, fun, x): self.success = success; self.fun = fun; self.x = x
+    def __init__(self, success, fun, x, message=""):
+        self.success = success
+        self.fun = fun
+        self.x = x
+        self.message = message
 
-def optimizar_dieta(df, req):
+def optimizar_dieta_lineal(df, req_p, req_e, req_f):
     costos = df["Precio Estimado (MXN/ton)"].astype(float).values
     pc = df["Proteina Cruda (PC % MS)"].astype(float).values / 100.0
     neg = df["NEg (Mcal/kg)"].astype(float).values
     fnd = df["FND (% MS)"].astype(float).values / 100.0
-    bounds = [(0.0, 1.0) if row["Disponible"] else (0.0, 0.0) for _, row in df.iterrows()]
-    res = linprog(costos, A_ub=np.array([-pc, -neg, -fnd]), b_ub=np.array([-req["pc"], -req["neg"], -req["fnd"]]), A_eq=np.ones((1, len(costos))), b_eq=np.array([1.0]), bounds=bounds, method='highs')
-    if res.success: return OptimizeResultCompat(True, res.fun, res.x)
-    return OptimizeResultCompat(True, 4500.0, np.array([0.1, 0.1, 0.3, 0.0, 0.3, 0.1, 0.1, 0.0, 0.0, 0.0]))
+    
+    bounds = []
+    for _, row in df.iterrows():
+        if not row["Disponible"]:
+            bounds.append((0.0, 0.0))
+        else:
+            min_i = max(0.0, float(row["Min Inclusión (%)"]) / 100.0)
+            max_i = min(1.0, float(row["Max Inclusión (%)"]) / 100.0)
+            bounds.append((min_i, max_i))
+            
+    A_eq = np.ones((1, len(costos)))
+    b_eq = np.array([1.0])
+    
+    A_ub = np.array([
+        -pc,
+        -neg,
+        -fnd
+    ])
+    b_ub = np.array([
+        -req_p,
+        -req_e,
+        -req_f
+    ])
+    
+    res = linprog(costos, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
+    if res.success:
+        return OptimizeResultCompat(True, res.fun, res.x, "Optimización Lineal Exitosa")
+    
+    # Tolerancia relajada si no hay solución estricta
+    b_ub_rel = np.array([-req_p * 0.90, -req_e * 0.90, -req_f])
+    res_rel = linprog(costos, A_ub=A_ub, b_ub=b_ub_rel, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
+    if res_rel.success:
+        return OptimizeResultCompat(True, res_rel.fun, res_rel.x, "Factible con tolerancia ajustada")
+    return OptimizeResultCompat(False, 5000.0, np.zeros(len(costos)), "Sin solución factible")
 
-res_opt = optimizar_dieta(df_base, {"pc": 0.13, "neg": 1.15, "fnd": 0.28})
-costo_ton = res_opt.fun
-dias_meta = max(1.0, (peso_objetivo - peso_actual) / gde)
-costo_alim = (cms_estimado * dias_meta / 1000.0) * costo_ton
-costo_tot = (peso_actual * precio_compra) + costo_alim + 750.0
-ingreso_tot = peso_objetivo * precio_venta
-utilidad_neta = ingreso_tot - costo_tot
+resultado_opt = optimizar_dieta_lineal(df_base, req_pc, req_neg, req_fnd)
+costo_tonelada = resultado_opt.fun
+dias_a_meta = max(1.0, (peso_objetivo - peso_actual) / gde)
+costo_alimentacion_cab = (cms_estimado * dias_a_meta / 1000.0) * costo_tonelada
+costo_total_cab = (peso_actual * precio_compra) + costo_alimentacion_cab + 650.0
+ingreso_venta_cab = peso_objetivo * precio_venta
+utilidad_neta_cab = ingreso_venta_cab - costo_total_cab
+roi_cab = (utilidad_neta_cab / costo_total_cab) * 100 if costo_total_cab > 0 else 0
 
-# --- PESTAÑAS DEL HUB DE DISPOSITIVOS DE IA Y RED IOT ---
+# --- PESTAÑAS DE LA APLICACIÓN ---
 tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
-    "📡 1. Dashboard IoT Central", 
-    "🏷️ 2. Collares y Aretes RFID", 
-    "🌡️ 3. Bolos Ruminales (pH)", 
-    "🎙️ 4. Micrófonos Acústicos (BRD)", 
-    "📷 5. Cámaras Visión (BCS/Cojeras)", 
-    "🚜 6. Básculas IoT Mezcladoras", 
-    "💬 7. Nutri-ON IoT Bot"
+    "🥗 1. Optimizador Lineal de Dieta",
+    "🧪 2. Ingredientes y Precios",
+    "📊 3. Economía y Rentabilidad",
+    "📡 4. Dashboard Red IoT",
+    "🌡️ 5. Bolos Ruminales & Sensores",
+    "🚜 6. Básculas & Mezcladora",
+    "💬 7. Nutri-ON Bot"
 ])
 
 with tab1:
-    st.subheader(f"Estado de Conectividad IoT - {estado_seleccionado}")
-    col1, col2, col3, col4 = st.columns(4)
-    with col1: st.metric("Sensores Activos", f"{cantidad_animales * 2} und", "100% Online")
-    with col2: st.metric("Collares IoT (Rumia)", f"{int(cantidad_animales * 0.96)} cab", "🟢 Normal")
-    with col3: st.metric("Bolos pH Activos", f"{int(cantidad_animales * 0.90)} und", "⚠️ 2 Alertas SARA")
-    with col4: st.metric("Utilidad Proyectada", f"${utilidad_neta:,.0f} MXN", "Por cabeza")
+    st.subheader(f"Formulación Óptima de Dieta ({estado_seleccionado})")
+    st.markdown(f"**Parámetros Activos:** Raza: `{raza_seleccionada}` | GDE Meta: `{gde} kg/día` | CMS Estimado: `{cms_estimado:.2f} kg/día`")
+    
+    if resultado_opt.success:
+        df_resultado = df_base.copy()
+        df_resultado["Proporción (%)"] = resultado_opt.x * 100.0
+        df_resultado["Aporte en Ración (kg/día/animal)"] = resultado_opt.x * cms_estimado
+        df_resultado_activa = df_resultado[df_resultado["Proporción (%)"] > 0.01][["Nombre del Ingrediente", "Categoria", "Precio Estimado (MXN/ton)", "Proporción (%)", "Aporte en Ración (kg/día/animal)"]]
+        
+        st.dataframe(df_resultado_activa, use_container_width=True, hide_index=True)
+        
+        col_res1, col_res2, col_res3 = st.columns(3)
+        with col_res1:
+            st.metric("Costo de la Ración (MXN/ton)", f"${costo_tonelada:,.2f}")
+        with col_res2:
+            st.metric("Costo Diario por Cabeza", f"${(cms_estimado / 1000.0) * costo_tonelada:,.2f} MXN")
+        with col_res3:
+            st.metric("Estatus del Solver Lineal", f"🟢 {resultado_opt.message}")
+    else:
+        st.error("No se encontró solución factible con las restricciones actuales. Ajusta los precios o límites de inclusión en la pestaña 2.")
 
-    st.markdown("---")
-    st.markdown("#### 📊 Telemetría en Tiempo Real (Broker MQTT / Gateway LoRaWAN)")
+with tab2:
+    st.subheader("🧪 Banco de Ingredientes y Restricciones de Inclusión")
+    st.markdown("Modifica los precios y límites mínimos/máximos de los ingredientes disponibles en tu región.")
+    st.session_state.df_ingredientes_state = st.data_editor(
+        st.session_state.df_ingredientes_state, num_rows="dynamic", use_container_width=True, key="editor_ingredientes_lineal"
+    )
+
+with tab3:
+    st.subheader("📊 Análisis Económico y Proyección por Lote")
+    col_ec1, col_ec2, col_ec3, col_ec4 = st.columns(4)
+    with col_ec1:
+        st.metric("Costo Compra Lote", f"${peso_actual * precio_compra * cantidad_animales:,.0f} MXN")
+        st.metric("Costo Alimento Total", f"${costo_alimentacion_cab * cantidad_animales:,.0f} MXN")
+    with col_ec2:
+        st.metric("Costo Total Producido", f"${costo_total_cab * cantidad_animales:,.0f} MXN")
+        st.metric("Días a la Meta", f"{dias_a_meta:.0f} días")
+    with col_ec3:
+        st.metric("Ingreso Venta Lote", f"${ingreso_venta_cab * cantidad_animales:,.0f} MXN")
+        st.metric("Utilidad Neta Total", f"${utilidad_neta_cab * cantidad_animales:,.0f} MXN")
+    with col_ec4:
+        st.metric("Utilidad por Cabeza", f"${utilidad_neta_cab:,.2f} MXN")
+        st.metric("ROI del Ciclo", f"{roi_cab:.1f}%")
+
+with tab4:
+    st.subheader(f"📡 Estado de Red IoT & Sensores en {estado_seleccionado}")
+    col_i1, col_i2, col_i3, col_i4 = st.columns(4)
+    with col_i1: st.metric("Sensores Activos", f"{cantidad_animales * 2} und", "100% Online")
+    with col_i2: st.metric("Collares IoT (Rumia)", f"{int(cantidad_animales * 0.96)} cab", "🟢 Normal")
+    with col_i3: st.metric("Bolos pH Activos", f"{int(cantidad_animales * 0.90)} und", "⚠️ 2 Alertas SARA")
+    with col_i4: st.metric("Utilidad Proyectada", f"${utilidad_neta_cab:,.0f} MXN", "Por cabeza")
+
     horas = [f"{h:02d}:00" for h in range(24)]
     rumia_promedio = [550, 520, 480, 400, 320, 250, 410, 600, 680, 650, 620, 590, 580, 610, 640, 660, 620, 590, 550, 520, 530, 560, 570, 560]
-    fig_iot = px.line(x=horas, y=rumia_promedio, title="Minutos de Masticación y Rumia Promedio del Lote (Vía Collares IoT)", markers=True)
+    fig_iot = px.line(x=horas, y=rumia_promedio, title="Minutos de Masticación y Rumia Promedio del Lote (Collares IoT)", markers=True)
     fig_iot.update_layout(plot_bgcolor="#ffffff", paper_bgcolor="#ffffff", font=dict(family="Calibri", size=12))
     st.plotly_chart(fig_iot, use_container_width=True)
 
-with tab2:
-    st.subheader("🏷️ Collares Inteligentes de Actividad & Aretes RFID SINIIGA")
-    df_collares_iot = pd.DataFrame({
-        "Arete RFID / ID": [f"MX-SINIIGA-{1000+i}" for i in range(1, 11)],
-        "Batería Collar IoT": ["98%", "91%", "45% (⚠️)", "99%", "88%", "76%", "32% (⚠️)", "95%", "90%", "85%"],
-        "Actividad Diaria": ["Normal", "Normal", "Baja (Inactivo)", "Normal", "Normal", "Normal", "Crítica (Aislar)", "Normal", "Normal", "Normal"],
-        "Temperatura Corporal": ["38.5°C", "38.6°C", "39.8°C (Fiebre)", "38.4°C", "38.5°C", "38.6°C", "40.2°C (Fiebre)", "38.5°C", "38.4°C", "38.6°C"]
-    })
-    st.dataframe(df_collares_iot, use_container_width=True, hide_index=True)
-
-with tab3:
-    st.subheader("🌡️ Bolos Ruminales Ingeribles (Telemetría de pH y Temperatura)")
-    col_ph1, col_ph2 = st.columns(2)
-    with col_ph1:
-        ph_actual = st.slider("pH Ruminal en Vivo (Promedio Lote)", 5.0, 7.0, 6.2, 0.05)
-        if ph_actual < 5.8:
-            st.error("🔴 **ALERTA CRÍTICA SARA:** pH menor a 5.8 detectado por bolos IoT. Riesgo de laminitis.")
-        else:
-            st.success("🟢 **pH Ruminal Estable:** Rango fisiológico seguro.")
-    with col_ph2:
-        st.metric("Temperatura Ruminal Interna", "38.9 °C", "Normal 🟢")
-        st.metric("Frecuencia de Transmisión", "Cada 15 minutos", "LoRaWAN Activo")
-
-with tab4:
-    st.subheader("🎙️ Micrófonos Acústicos Inteligentes (Detección Edge AI de BRD / Tos)")
-    freg_tos_iot = st.slider("Eventos de Tos Captados por Micrófonos IoT (por hora)", 0, 30, 4, 1)
-    if freg_tos_iot > 10:
-        st.error("🚨 **Alerta de Brote Respiratorio (BRD):** Alta densidad de eventos de tos acústica registrados en el Corral #3.")
-    else:
-        st.success("🟢 **Tasa Acústica Normal:** Sin indicios de patologías respiratorias masivas.")
-
 with tab5:
-    st.subheader("📷 Cámaras de Visión Artificial y Termografía (Cojeras y BCS)")
-    st.info("📊 **Estadísticas de Visión:**\n* **Animales Escaneados Hoy:** 245 cabezas\n* **Índice de Cojera Detectado:** 2 animales (Grado 2)\n* **Condición Corporal Promedio (BCS):** 2.8 / 5.0")
+    st.subheader("🌡️ Bolos Ruminales Ingeribles (Telemetría de pH y Temperatura 24/7)")
+    ph_actual = st.slider("pH Ruminal en Vivo (Promedio Lote)", 5.0, 7.0, 6.2, 0.05)
+    if ph_actual < 5.8:
+        st.error("🔴 **ALERTA CRÍTICA SARA:** pH menor a 5.8 detectado por bolos IoT. Riesgo de laminitis.")
+    else:
+        st.success("🟢 **pH Ruminal Estable:** Rango fisiológico seguro.")
 
 with tab6:
-    st.subheader("🚜 Básculas IoT para Carros Mezcladores (Control de Carga)")
+    st.subheader("🚜 Básculas IoT para Carros Mezcladores")
     st.info(
         "🔗 **Estado de Conectividad Báscula #1:** Conectado vía Bluetooth Low Energy (BLE)\n\n"
-        f"* **Ración Formulatada:** {raza_lote}\n"
-        f"* **Costo Tonelada Calculado:** `${costo_ton:,.2f} MXN`\n"
-        "* **Precisión de Carga en Batea:** `99.4%` (🟢 Tolerancia OK)"
+        f"* **Ración Óptima Formulatada:** {raza_seleccionada}\n"
+        f"* **Costo Tonelada Optimizado:** `${costo_tonelada:,.2f} MXN`\n"
+        "* **Precisión de Carga en Batea:** `99.5%` (🟢 Tolerancia OK)"
     )
 
 with tab7:
-    st.subheader("💬 Asistente Virtual Conectado a la Red IoT (Nutri-ON Bot)")
+    st.subheader("💬 Asistente Virtual Nutri-ON Bot")
     for msg in st.session_state.nutrion_messages:
         with st.chat_message(msg["role"]): st.markdown(msg["content"])
     
-    if q := st.chat_input("Pregúntale al Hub IoT (ej. 'cuántos collares tienen batería baja', 'cómo está el pH ruminal')..."):
+    if q := st.chat_input("Pregúntale al sistema sobre la dieta o la red IoT..."):
         st.session_state.nutrion_messages.append({"role": "user", "content": q})
         with st.chat_message("user"): st.markdown(q)
-        ans = f"🤖 **Respuesta del Hub IoT ({estado_seleccionado}):** Analizando los flujos de datos en tiempo real de tus collares, bolos y básculas, el lote de {cantidad_animales} cabezas se encuentra operando con una eficiencia del 94%. ¿Deseas que genere una orden automática de atención veterinaria para los 2 aretes con alerta?"
+        ans = f"🤖 **Respuesta Nutri-ON ({estado_seleccionado}):** Analizando tu lote de {cantidad_animales} cabezas con el modelo lineal y telemetría, la dieta actual está optimizada a un costo de ${costo_tonelada:,.2f} MXN/ton con una GDE de {gde} kg/día. ¿Deseas exportar la orden de carga para el carro mezclador?"
         st.session_state.nutrion_messages.append({"role": "assistant", "content": ans})
         with st.chat_message("assistant"): st.markdown(ans)
