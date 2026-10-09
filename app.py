@@ -139,7 +139,7 @@ def cargar_usuarios_persistentes():
             "password": hash_password("1234"),
             "email": "admin@nutrion360.com",
             "subscription_active": True,
-            "plan": "Anual Ultra AI & IoT (12 Meses) - $9,600 MXN | $800.00/mes",
+            "plan": "Anual Nacional Elite (12 Meses - $800 MXN/mes | Total: $9,600 MXN)",
             "auto_renew": True,
             "next_renewal_date": (datetime.now() + timedelta(days=365)).strftime("%Y-%m-%d"),
             "fecha_registro": "2026-01-01"
@@ -148,7 +148,7 @@ def cargar_usuarios_persistentes():
             "password": hash_password("elite360"),
             "email": "alejandro.castaneda@nutrion360.com",
             "subscription_active": True,
-            "plan": "Anual Ultra AI & IoT (12 Meses) - $9,600 MXN | $800.00/mes",
+            "plan": "Anual Nacional Elite (12 Meses - $800 MXN/mes | Total: $9,600 MXN)",
             "auto_renew": True,
             "next_renewal_date": (datetime.now() + timedelta(days=365)).strftime("%Y-%m-%d"),
             "fecha_registro": "2026-01-01"
@@ -236,9 +236,9 @@ if not st.session_state.authenticated:
         plan_elegido = st.radio(
             "Planes de Suscripción Nutri-ON 360 Disponibles:",
             [
-                "Trimestral Pro AI (3 Meses) - $3,000 MXN | $1,000.00/mes",
-                "Semestral Feedlot IoT (6 Meses) - $5,400 MXN | $900.00/mes",
-                "Anual Ultra AI & IoT (12 Meses) - $9,600 MXN | $800.00/mes (Acceso Total)"
+                "Trimestral (3 Meses - $1,000 MXN/mes | Total: $3,000 MXN): Flexibilidad y control total para tu ciclo actual de engorda con inversión inteligente.",
+                "Semestral Feedlot (6 Meses - $900 MXN/mes | Total: $5,400 MXN): ¡Ahorra $600 MXN! El equilibrio perfecto para optimizar ciclos completos con un 10% de ahorro directo.",
+                "Anual Nacional Elite (12 Meses - $800 MXN/mes | Total: $9,600 MXN): ¡Ahorra $2,400 MXN! La opción más inteligente de los ganaderos de élite: acceso ilimitado a toda la red IoT con 20% de descuento y máximo ROI."
             ],
             index=2
         )
@@ -272,9 +272,11 @@ if not st.session_state.authenticated:
         
         st.markdown("")
         
-        try:
-            costo_str = plan_elegido.split("-")[1].split("|")[0].strip()
-        except Exception:
+        if "Total: $3,000" in plan_elegido:
+            costo_str = "$3,000 MXN"
+        elif "Total: $5,400" in plan_elegido:
+            costo_str = "$5,400 MXN"
+        else:
             costo_str = "$9,600 MXN"
         
         if st.button(f"💳 Pagar {costo_str} y Activar Licencia Ultra AI", use_container_width=True):
