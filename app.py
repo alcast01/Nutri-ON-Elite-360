@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 
 # --- 1. CONFIGURACIÓN DE PÁGINA Y DISEÑO SaaS PROFESIONAL (CALIBRI) ---
 st.set_page_config(
-    page_title="Nutri-ON 360 ULTRA | Modelo Lineal Fisiológico & Red IoT México",
+    page_title="Nutri-ON 360 ULTRA | Modelo Fisiológico & Red IoT México",
     page_icon="🐄",
     layout="centered",
     initial_sidebar_state="expanded"
@@ -261,29 +261,20 @@ if "df_ingredientes_state" not in st.session_state:
 df_base = st.session_state.df_ingredientes_state
 df_base["Disponible"] = df_base["Disponible"].astype(bool)
 
-# 1. Ajustes por Clima (THI) y Estado
 thi_val = perfil_estado["thi_base"] if "Confort" in nivel_thi else (77 if "Moderado" in nivel_thi else 82)
 factor_thi_cms = 0.94 if thi_val >= 74 and thi_val < 79 else (0.85 if thi_val >= 79 else 1.00)
 
-# 2. Ajustes por Condición de Corral / Lodo
 factor_lodo_cms = 1.00 if "Seco" in condicion_lodo else (0.93 if "Moderado" in condicion_lodo else 0.87)
 factor_lodo_energia = 1.00 if "Seco" in condicion_lodo else (1.10 if "Moderado" in condicion_lodo else 1.20)
 
-# 3. Ajustes por Condición Corporal (CC) e Historial
 factor_cc_cms = 0.96 if condicion_corporal > 3.5 else (1.04 if condicion_corporal < 2.5 else 1.00)
-
-# 4. Ajustes por Sistema de Producción (Gasto Energético por Movilidad)
 factor_sistema_energia = 1.00 if "Feedlot" in sistema_produccion else (1.08 if "Semi" in sistema_produccion else 1.18)
 
-# 5. Ajustes por Genética (Raza), Sexo y Marco
 factor_raza_req = 1.06 if "Británicas" in raza_seleccionada else (1.08 if "Continentales" in raza_seleccionada else (0.94 if "Cebú" in raza_seleccionada else 1.00))
 factor_sexo_req = 1.05 if "Toros" in sexo_lote else (0.97 if "Vaquillas" in sexo_lote else 1.00)
 factor_marco_req = 1.05 if "Precoz" in marco_lote else (0.95 if "Grande" in marco_lote else 1.00)
-
-# 6. Ajuste por Aditivos (Ionóforos mejoran energía metabolizable aparente ~4%)
 factor_aditivo_energia = 1.04 if "Ionóforos" in aditivo_ruminal or "Ambos" in aditivo_ruminal else 1.00
 
-# Cálculo Final de Consumo de Materia Seca (CMS) y Requerimientos Fisiológicos Mínimos
 cms_estimado = peso_actual * 0.024 * factor_thi_cms * factor_lodo_cms * factor_cc_cms
 req_pc = (0.115 + (gde * 0.025)) * factor_raza_req * factor_sexo_req
 req_neg = ((1.02 + (gde * 0.16)) * factor_raza_req * factor_marco_req * factor_lodo_energia * factor_sistema_energia) / factor_aditivo_energia
@@ -314,16 +305,8 @@ def optimizar_dieta_fisiologica(df, req_p, req_e, req_f):
     A_eq = np.ones((1, len(costos)))
     b_eq = np.array([1.0])
     
-    A_ub = np.array([
-        -pc,
-        -neg,
-        -fnd
-    ])
-    b_ub = np.array([
-        -req_p,
-        -req_e,
-        -req_f
-    ])
+    A_ub = np.array([-pc, -neg, -fnd])
+    b_ub = np.array([-req_p, -req_e, -req_f])
     
     res = linprog(costos, A_ub=A_ub, b_ub=b_ub, A_eq=A_eq, b_eq=b_eq, bounds=bounds, method='highs')
     if res.success:
@@ -344,15 +327,16 @@ ingreso_venta_cab = peso_objetivo * precio_venta
 utilidad_neta_cab = ingreso_venta_cab - costo_total_cab
 roi_cab = (utilidad_neta_cab / costo_total_cab) * 100 if costo_total_cab > 0 else 0
 
-# --- PESTAÑAS DE LA APLICACIÓN ---
-tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+# --- PESTAÑAS DE LA APLICACIÓN (8 TABS CON DIETA FINAL OPTIMIZADA) ---
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
     "🥗 1. Dieta Óptima Fisiológica",
     "🧪 2. Banco de Ingredientes",
     "📊 3. Economía y Lote",
     "📡 4. Dashboard Red IoT",
     "🌡️ 5. Bolos Ruminales (pH)",
     "🚜 6. Básculas & Mezcladora",
-    "💬 7. Nutri-ON Bot"
+    "💬 7. Nutri-ON Bot",
+    "📋 8. Dieta Final Optimizada"
 ])
 
 with tab1:
@@ -442,3 +426,57 @@ with tab7:
         ans = f"🤖 **Respuesta Nutri-ON ({estado_seleccionado}):** Analizando tu lote de {cantidad_animales} cabezas bajo el modelo fisiológico para {raza_seleccionada} ({sexo_lote}), la dieta está optimizada a un costo de ${costo_tonelada:,.2f} MXN/ton con un CMS ajustado de {cms_estimado:.2f} kg/día. ¿Deseas exportar la orden de carga para el carro mezclador?"
         st.session_state.nutrion_messages.append({"role": "assistant", "content": ans})
         with st.chat_message("assistant"): st.markdown(ans)
+
+with tab8:
+    st.subheader("📋 Reporte Ejecutivo: Dieta Final y Optimizada al Menor Costo")
+    st.markdown(
+        "Esta sección muestra la solución definitiva del **Modelo de Programación Lineal**, "
+        "garantizando el cumplimiento estricto de las necesidades fisiológicas del lote al **costo más bajo posible**."
+    )
+
+    if resultado_opt.success:
+        df_final = df_base.copy()
+        df_final["Inclusión (%)"] = resultado_opt.x * 100.0
+        df_final["Kg / Día / Animal"] = resultado_opt.x * cms_estimado
+        df_final["Kg / Día / Lote Total"] = resultado_opt.x * cms_estimado * cantidad_animales
+        
+        df_activa_final = df_final[df_final["Inclusión (%)"] > 0.01][[
+            "Nombre del Ingrediente", "Categoria", "Precio Estimado (MXN/ton)", 
+            "Inclusión (%)", "Kg / Día / Animal", "Kg / Día / Lote Total"
+        ]].reset_index(drop=True)
+
+        st.dataframe(df_activa_final, use_container_width=True, hide_index=True)
+
+        st.markdown("---")
+        st.markdown("##### 📈 Validación Nutricional y Costos de la Dieta Final")
+        
+        pc_arr = df_base["Proteina Cruda (PC % MS)"].astype(float).values / 100.0
+        neg_arr = df_base["NEg (Mcal/kg)"].astype(float).values
+        fnd_arr = df_base["FND (% MS)"].astype(float).values / 100.0
+        
+        aporte_pc_real = np.sum(resultado_opt.x * pc_arr) * 100.0
+        aporte_neg_real = np.sum(resultado_opt.x * neg_arr)
+        aporte_fnd_real = np.sum(resultado_opt.x * fnd_arr) * 100.0
+
+        col_vf1, col_vf2, col_vf3, col_vf4 = st.columns(4)
+        with col_vf1:
+            st.metric("Costo Tonelada Final", f"${costo_tonelada:,.2f} MXN", "Mínimo Costo")
+            st.metric("Proteína Cruda Aportada", f"{aporte_pc_real:.2f}%", f"Mínimo Req: {req_pc*100:.2f}%")
+        with col_vf2:
+            st.metric("Costo Diario / Cabeza", f"${(cms_estimado/1000.0)*costo_tonelada:,.2f} MXN")
+            st.metric("Energía NEg Aportada", f"{aporte_neg_real:.2f} Mcal/kg", f"Mínimo Req: {req_neg:.2f}")
+        with col_vf3:
+            st.metric("Consumo Materia Seca", f"{cms_estimado:.2f} kg/día")
+            st.metric("Fibra FND Aportada", f"{aporte_fnd_real:.2f}%", f"Mínimo Req: {req_fnd*100:.2f}%")
+        with col_vf4:
+            st.metric("Costo Diario Lote Total", f"${((cms_estimado/1000.0)*costo_tonelada)*cantidad_animales:,.2f} MXN")
+            st.metric("Estatus del Solver", "🟢 Óptimo / Factible")
+
+        st.markdown("---")
+        st.info(
+            f"💡 **Orden de Carga para el Carro Mezclador (Lote de {cantidad_animales} cabezas):**\n"
+            f"La dieta optimizada requiere un consumo diario total de lote de **{(cms_estimado*cantidad_animales):,.1f} kg de materia seca**. "
+            "Sincronice esta tabla con las básculas IoT de batea para asegurar cero mermas y máxima precisión operativa."
+        )
+    else:
+        st.error("⚠️ No hay una dieta optimizada disponible porque el modelo lineal no encontró solución factible. Revise los límites e ingredientes en la pestaña 2.")
