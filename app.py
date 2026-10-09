@@ -4,14 +4,13 @@ import pandas as pd
 from scipy.optimize import linprog
 import plotly.express as px
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 from fpdf import FPDF
 import json
 import os
 import hashlib
 from datetime import datetime, timedelta
 
-# --- 1. CONFIGURACIÓN DE PÁGINA Y DISEÑO SaaS PROFESIONAL ---
+# --- 1. CONFIGURACIÓN DE PÁGINA Y DISEÑO SaaS PROFESIONAL (CALIBRI) ---
 st.set_page_config(
     page_title="Nutri-ON 360 ULTRA | Red IoT & Edge AI México",
     page_icon="🐄",
@@ -61,7 +60,7 @@ def cargar_usuarios_persistentes():
             "password": hash_password("1234"),
             "email": "admin@nutrion-iot.mx",
             "subscription_active": True,
-            "plan": "Red IoT Feedlot Elite (12 Meses) - $12,000 MXN",
+            "plan": "Anual Nacional Elite (12 Meses) - $800.00 MXN/mes | Total: $9,600 MXN",
             "auto_renew": True,
             "next_renewal_date": (datetime.now() + timedelta(days=365)).strftime("%Y-%m-%d")
         },
@@ -69,7 +68,7 @@ def cargar_usuarios_persistentes():
             "password": hash_password("elite360"),
             "email": "alejandro.castaneda@nutrion-iot.mx",
             "subscription_active": True,
-            "plan": "Red IoT Feedlot Elite (12 Meses) - $12,000 MXN",
+            "plan": "Anual Nacional Elite (12 Meses) - $800.00 MXN/mes | Total: $9,600 MXN",
             "auto_renew": True,
             "next_renewal_date": (datetime.now() + timedelta(days=365)).strftime("%Y-%m-%d")
         }
@@ -85,13 +84,13 @@ if "authenticated" not in st.session_state: st.session_state.authenticated = Fal
 if "current_user" not in st.session_state: st.session_state.current_user = ""
 if "nutrion_messages" not in st.session_state:
     st.session_state.nutrion_messages = [
-        {"role": "assistant", "content": "¡Hola! Soy **Nutri-ON IoT**, tu núcleo central de inteligencia artificial y telemetría ganadera. Estoy conectado en tiempo real con los collares, bolos ruminales, micrófonos acústicos y básculas inteligentes de tu rancho. ¿Qué anomalía o reporte deseas revisar hoy?"}
+        {"role": "assistant", "content": "¡Hola! Soy **Nutri-ON IoT**, tu núcleo central de inteligencia artificial y telemetría ganadera en México. Conectado a collares, bolos ruminales y básculas inteligentes. ¿Qué reporte deseas revisar hoy?"}
     ]
 
-# --- PANTALLA DE ACCESO ---
+# --- PANTALLA DE ACCESO / SUSCRIPCIÓN ---
 if not st.session_state.authenticated:
     st.markdown("""
-        <h2 style="text-align: center; color: #064e3b; font-weight: 800; margin-top: 30px;">
+        <h2 style="text-align: center; color: #064e3b; font-weight: 800; margin-top: 20px;">
             Nutri-ON <span style="color: #059669;">360</span> <span style="font-size: 0.5em; background: #059669; color: white; padding: 2px 8px; border-radius: 6px;">HUB RED IOT V1.0</span>
         </h2>
         <p style="text-align: center; color: #059669; font-weight: 700; font-size: 0.95rem;">
@@ -99,7 +98,7 @@ if not st.session_state.authenticated:
         </p>
     """, unsafe_allow_html=True)
     
-    tab_login, tab_register = st.tabs(["🔑 Iniciar Sesión", "💳 Licencia Red IoT"])
+    tab_login, tab_register = st.tabs(["🔑 Iniciar Sesión", "💳 Planes & Licencias Red IoT"])
     with tab_login:
         user_input = st.text_input("Usuario", key="l_user")
         pass_input = st.text_input("Contraseña", type="password", key="l_pass")
@@ -111,33 +110,72 @@ if not st.session_state.authenticated:
                 st.rerun()
             else:
                 st.error("Credenciales inválidas.")
+    
     with tab_register:
-        st.markdown("### 📡 Adquiere tu Licencia Red IoT & Edge AI")
-        plan_e = st.radio("Planes de Conectividad IoT:", ["Mensual IoT Core - $1,200 MXN", "Anual Feedlot Elite - $12,000 MXN (Conexión Ilimitada Dispositivos)"])
-        r_user = st.text_input("Nuevo Usuario", key="r_u")
-        r_email = st.text_input("Correo", key="r_e")
-        r_pass = st.text_input("Contraseña", type="password", key="r_p")
-        if st.button("💳 Pagar y Activar Hub IoT", use_container_width=True):
+        st.markdown("### 🌟 Selecciona tu Plan Estratégico y Comienza a Ahorrar")
+        plan_elegido = st.radio(
+            "Planes de Conectividad IoT Disponibles:",
+            [
+                "Trimestral (3 Meses) - $1,000.00 MXN/mes | Total: $3,000 MXN 🚀 (Flexibilidad y control total para tu ciclo actual)",
+                "Semestral Feedlot (6 Meses) - $900.00 MXN/mes | Total: $5,400 MXN 💡 (¡Ahorra $600 MXN! El equilibrio perfecto para ciclos completos)",
+                "Anual Nacional Elite (12 Meses) - $800.00 MXN/mes | Total: $9,600 MXN 👑 (¡Ahorra $2,400 MXN! Máxima rentabilidad y 20% de descuento directo)"
+            ],
+            index=2
+        )
+        
+        st.markdown("---")
+        col_r1, col_r2 = st.columns(2)
+        with col_r1:
+            r_user = st.text_input("Nombre de Usuario", key="r_u")
+            r_email = st.text_input("Correo Electrónico", key="r_e")
+        with col_r2:
+            r_pass = st.text_input("Contraseña", type="password", key="r_p")
+            r_card = st.text_input("Tarjeta de Crédito / Débito", placeholder="4000 1234 5678 9010", key="r_c")
+        
+        auto_renew_reg = st.checkbox("🔄 Activar Renovación Automática Segura", value=True)
+        st.markdown("")
+        
+        if st.button("💳 Pagar Licencia y Activar Red IoT", use_container_width=True):
             db = cargar_usuarios_persistentes()
-            db[r_user] = {"password": hash_password(r_pass), "email": r_email, "subscription_active": True, "plan": plan_e, "auto_renew": True, "next_renewal_date": "2027-01-01"}
-            guardar_usuarios_persistentes(db)
-            st.session_state.authenticated = True
-            st.session_state.current_user = r_user
-            st.rerun()
+            if not r_user or not r_pass or not r_card:
+                st.warning("⚠️ Completa los campos obligatorios de usuario y pago.")
+            elif r_user in db:
+                st.error("⚠️ El usuario ya existe.")
+            else:
+                dias_periodo = 90 if "Trimestral" in plan_elegido else (180 if "Semestral" in plan_elegido else 365)
+                fecha_renov = (datetime.now() + timedelta(days=dias_periodo)).strftime("%Y-%m-%d")
+                
+                db[r_user] = {
+                    "password": hash_password(r_pass),
+                    "email": r_email,
+                    "subscription_active": True,
+                    "plan": plan_elegido,
+                    "auto_renew": auto_renew_reg,
+                    "next_renewal_date": fecha_renov
+                }
+                guardar_usuarios_persistentes(db)
+                st.session_state.authenticated = True
+                st.session_state.current_user = r_user
+                st.success("🎉 ¡Pago exitoso! Dispositivos de IA sincronizados con el Hub Central.")
+                st.balloons()
+                st.rerun()
     st.stop()
 
-# --- HEADER DE USUARIO Y RED IOT ---
-user_info = cargar_usuarios_persistentes().get(st.session_state.current_user, {})
+# --- HEADER Y BARRA LATERAL ---
+db_activos = cargar_usuarios_persistentes()
+user_info = db_activos.get(st.session_state.current_user, {})
+plan_activo = user_info.get("plan", "Plan Nacional Elite")
+
 st.markdown(f"""
-    <div style="background: linear-gradient(135deg, #ffffff 0%, #ecfdf5 100%); padding: 20px; border-radius: 16px; border: 2px solid #34d399; margin-bottom: 20px;">
+    <div style="background: linear-gradient(135deg, #ffffff 0%, #ecfdf5 100%); padding: 18px 22px; border-radius: 16px; border: 2px solid #34d399; margin-bottom: 20px;">
         <h2 style="margin: 0; color: #064e3b; font-size: 1.5em;">🌐 Nutri-ON Red IoT & Edge AI Hub</h2>
-        <p style="margin: 4px 0 0 0; color: #059669; font-weight: 600; font-size: 0.9em;">
-            Conectado a Broker MQTT Central | Estado de Red: <span style="color: #10b981;">🟢 100% Operativo (LoRaWAN / 4G LTE)</span>
+        <p style="margin: 4px 0 0 0; color: #059669; font-weight: 600; font-size: 0.88em;">
+            Usuario: <span style="color: #0f172a;">{st.session_state.current_user.capitalize()}</span> | Licencia: <span style="color: #d97706;">{plan_activo}</span>
         </p>
     </div>
 """, unsafe_allow_html=True)
 
-# --- BASE DE DATOS Y ESTADOS DE MÉXICO ---
+# Estados de México
 estados_mexico_perfil = {
     "Aguascalientes": {"clima": "Seco / Templado", "thi_base": 72},
     "Baja California": {"clima": "Árido / Desértico", "thi_base": 76},
@@ -151,6 +189,25 @@ estados_mexico_perfil = {
     "Zacatecas": {"clima": "Seco / Semiárido", "thi_base": 72}
 }
 
+with st.sidebar:
+    st.markdown("### ⚙️ Configuración Red IoT")
+    estado_seleccionado = st.selectbox("Estado de México", list(estados_mexico_perfil.keys()))
+    cantidad_animales = st.number_input("Cabezas en Lote IoT", min_value=1, max_value=5000, value=250, step=10)
+    peso_actual = st.slider("Peso Actual Promedio (kg)", 200.0, 650.0, 280.0, 10.0)
+    peso_objetivo = st.slider("Peso Venta Meta (kg)", 400.0, 750.0, 540.0, 10.0)
+    gde = st.slider("GDE Meta (kg/día)", 0.8, 2.2, 1.5, 0.1)
+
+    precio_compra = st.number_input("Precio Compra ($/kg)", 30.0, 100.0, 55.0)
+    precio_venta = st.number_input("Precio Venta ($/kg)", 30.0, 100.0, 50.0)
+    raza_lote = st.selectbox("Raza", ["Beefmaster / Brangus", "Angus / Hereford", "Charolais / Simmental", "Brahman / Nelore", "Criollo"])
+
+    st.markdown("---")
+    if st.button("🚪 Cerrar Sesión", use_container_width=True):
+        st.session_state.authenticated = False
+        st.session_state.current_user = ""
+        st.rerun()
+
+# Base de ingredientes y cálculos de optimización
 if "df_ingredientes_state" not in st.session_state:
     st.session_state.df_ingredientes_state = pd.DataFrame({
         "Nombre del Ingrediente": ["Rastrojo de maiz", "Harina de soya", "Grano de maiz molido", "Urea", "Ensilado de maiz", "Canola", "Melaza", "Mineral Regional", "Malta", "Grasa bypass"],
@@ -172,24 +229,6 @@ if "df_ingredientes_state" not in st.session_state:
         "Max Inclusión (%)": [100.0, 100.0, 100.0, 1.5, 100.0, 100.0, 100.0, 5.0, 5.0, 5.0]
     })
 
-# --- BARRA LATERAL ---
-st.sidebar.markdown(f"### ⚙️ Configuración Red IoT")
-estado_seleccionado = st.sidebar.selectbox("Estado de México", list(estados_mexico_perfil.keys()))
-cantidad_animales = st.sidebar.number_input("Cabezas en Lote IoT", min_value=1, max_value=5000, value=250, step=10)
-peso_actual = st.sidebar.slider("Peso Actual Promedio (kg)", 200.0, 650.0, 280.0, 10.0)
-peso_objetivo = st.sidebar.slider("Peso Venta Meta (kg)", 400.0, 750.0, 540.0, 10.0)
-gde = st.sidebar.slider("GDE Meta (kg/día)", 0.8, 2.2, 1.5, 0.1)
-
-precio_compra = st.sidebar.number_input("Precio Compra ($/kg)", 30.0, 100.0, 55.0)
-precio_venta = st.sidebar.number_input("Precio Venta ($/kg)", 30.0, 100.0, 50.0)
-raza_lote = st.sidebar.selectbox("Raza", ["Beefmaster / Brangus", "Angus / Hereford", "Charolais / Simmental", "Brahman / Nelore", "Criollo"])
-
-if st.sidebar.button("🚪 Cerrar Sesión", use_container_width=True):
-    st.session_state.authenticated = False
-    st.session_state.current_user = ""
-    st.rerun()
-
-# --- CÁLCULOS DE OPTIMIZACIÓN ---
 df_base = st.session_state.df_ingredientes_state
 df_base["Disponible"] = df_base["Disponible"].astype(bool)
 cms_estimado = peso_actual * 0.024 * (1.03 if "Veracruz" in estado_seleccionado else 1.00)
@@ -236,8 +275,6 @@ with tab1:
 
     st.markdown("---")
     st.markdown("#### 📊 Telemetría en Tiempo Real (Broker MQTT / Gateway LoRaWAN)")
-    
-    # Gráfica de Actividad del Lote conectada a sensores
     horas = [f"{h:02d}:00" for h in range(24)]
     rumia_promedio = [550, 520, 480, 400, 320, 250, 410, 600, 680, 650, 620, 590, 580, 610, 640, 660, 620, 590, 550, 520, 530, 560, 570, 560]
     fig_iot = px.line(x=horas, y=rumia_promedio, title="Minutos de Masticación y Rumia Promedio del Lote (Vía Collares IoT)", markers=True)
@@ -246,8 +283,6 @@ with tab1:
 
 with tab2:
     st.subheader("🏷️ Collares Inteligentes de Actividad & Aretes RFID SINIIGA")
-    st.markdown("Monitoreo individual de acelerometría tridimensional y geolocalización por arete electrónico:")
-    
     df_collares_iot = pd.DataFrame({
         "Arete RFID / ID": [f"MX-SINIIGA-{1000+i}" for i in range(1, 11)],
         "Batería Collar IoT": ["98%", "91%", "45% (⚠️)", "99%", "88%", "76%", "32% (⚠️)", "95%", "90%", "85%"],
@@ -258,8 +293,6 @@ with tab2:
 
 with tab3:
     st.subheader("🌡️ Bolos Ruminales Ingeribles (Telemetría de pH y Temperatura)")
-    st.markdown("Los bolos alojados en el retículo-rumen transmiten por radiofrecuencia el nivel de acidez para prevenir la Acidosis Ruminal Subclínica (SARA):")
-    
     col_ph1, col_ph2 = st.columns(2)
     with col_ph1:
         ph_actual = st.slider("pH Ruminal en Vivo (Promedio Lote)", 5.0, 7.0, 6.2, 0.05)
@@ -273,9 +306,7 @@ with tab3:
 
 with tab4:
     st.subheader("🎙️ Micrófonos Acústicos Inteligentes (Detección Edge AI de BRD / Tos)")
-    st.markdown("Algoritmo de Inteligencia Artificial auditiva instalado en corrales para identificar patrones acústicos de tos bovina:")
-    
-    frec_tos_iot = st.slider("Eventos de Tos Captados por Micrófonos IoT (por hora)", 0, 30, 4, 1)
+    freg_tos_iot = st.slider("Eventos de Tos Captados por Micrófonos IoT (por hora)", 0, 30, 4, 1)
     if freg_tos_iot > 10:
         st.error("🚨 **Alerta de Brote Respiratorio (BRD):** Alta densidad de eventos de tos acústica registrados en el Corral #3.")
     else:
@@ -283,21 +314,13 @@ with tab4:
 
 with tab5:
     st.subheader("📷 Cámaras de Visión Artificial y Termografía (Cojeras y BCS)")
-    st.markdown("Cámaras cenitales con Edge AI analizan la simetría de la marcha al pasar por el bebedero y detectan inflamaciones:")
-    
-    col_v1, col_v2 = st.columns(2)
-    with col_v1:
-        st.info("📊 **Estadísticas de Visión:**\n* **Animales Escaneados Hoy:** 245 cabezas\n* **Índice de Cojera Detectado:** 2 animales (Grado 2)\n* **Condición Corporal Promedio (BCS):** 2.8 / 5.0")
-    with col_v2:
-        st.success("🟢 **Cámaras Térmicas:** Sin puntos calientes anormales en articulaciones o testas.")
+    st.info("📊 **Estadísticas de Visión:**\n* **Animales Escaneados Hoy:** 245 cabezas\n* **Índice de Cojera Detectado:** 2 animales (Grado 2)\n* **Condición Corporal Promedio (BCS):** 2.8 / 5.0")
 
 with tab6:
     st.subheader("🚜 Básculas IoT para Carros Mezcladores (Control de Carga)")
-    st.markdown("Indicadores de pesaje inalámbricos conectados al software de formulación Nutri-ON para cero mermas:")
-    
     st.info(
         "🔗 **Estado de Conectividad Báscula #1:** Conectado vía Bluetooth Low Energy (BLE)\n\n"
-        f"* **Ración Formulatada:** {raza_lote} ({fase if 'fase' in locals() else 'Engorda'})\n"
+        f"* **Ración Formulatada:** {raza_lote}\n"
         f"* **Costo Tonelada Calculado:** `${costo_ton:,.2f} MXN`\n"
         "* **Precisión de Carga en Batea:** `99.4%` (🟢 Tolerancia OK)"
     )
