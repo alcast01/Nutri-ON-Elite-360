@@ -139,7 +139,7 @@ def cargar_usuarios_persistentes():
             "password": hash_password("1234"),
             "email": "admin@nutrion360.com",
             "subscription_active": True,
-            "plan": "Anual Nacional Elite (12 Meses - $800 MXN/mes | Total: $9,600 MXN)",
+            "plan": "Anual Nacional Elite (12 Meses - $800 MXN/mes | Total: $9,600 MXN): “¡Ahorra $2,400 MXN! La opción más inteligente de los ganaderos de élite: acceso ilimitado a toda la red IoT con 20% de descuento y máximo ROI.”",
             "auto_renew": True,
             "next_renewal_date": (datetime.now() + timedelta(days=365)).strftime("%Y-%m-%d"),
             "fecha_registro": "2026-01-01"
@@ -148,7 +148,7 @@ def cargar_usuarios_persistentes():
             "password": hash_password("elite360"),
             "email": "alejandro.castaneda@nutrion360.com",
             "subscription_active": True,
-            "plan": "Anual Nacional Elite (12 Meses - $800 MXN/mes | Total: $9,600 MXN)",
+            "plan": "Anual Nacional Elite (12 Meses - $800 MXN/mes | Total: $9,600 MXN): “¡Ahorra $2,400 MXN! La opción más inteligente de los ganaderos de élite: acceso ilimitado a toda la red IoT con 20% de descuento y máximo ROI.”",
             "auto_renew": True,
             "next_renewal_date": (datetime.now() + timedelta(days=365)).strftime("%Y-%m-%d"),
             "fecha_registro": "2026-01-01"
@@ -236,9 +236,9 @@ if not st.session_state.authenticated:
         plan_elegido = st.radio(
             "Planes de Suscripción Nutri-ON 360 Disponibles:",
             [
-                "Trimestral (3 Meses - $1,000 MXN/mes | Total: $3,000 MXN): Flexibilidad y control total para tu ciclo actual de engorda con inversión inteligente.",
-                "Semestral Feedlot (6 Meses - $900 MXN/mes | Total: $5,400 MXN): ¡Ahorra $600 MXN! El equilibrio perfecto para optimizar ciclos completos con un 10% de ahorro directo.",
-                "Anual Nacional Elite (12 Meses - $800 MXN/mes | Total: $9,600 MXN): ¡Ahorra $2,400 MXN! La opción más inteligente de los ganaderos de élite: acceso ilimitado a toda la red IoT con 20% de descuento y máximo ROI."
+                "Trimestral (3 Meses - $1,000 MXN/mes | Total: $3,000 MXN): \"Flexibilidad y control total para tu ciclo actual de engorda con inversión inteligente.\"",
+                "Semestral Feedlot (6 Meses - $900 MXN/mes | Total: $5,400 MXN): “¡Ahorra $600 MXN! El equilibrio perfecto para optimizar ciclos completos con un 10% de ahorro directo.”",
+                "Anual Nacional Elite (12 Meses - $800 MXN/mes | Total: $9,600 MXN): “¡Ahorra $2,400 MXN! La opción más inteligente de los ganaderos de élite: acceso ilimitado a toda la red IoT con 20% de descuento y máximo ROI.”"
             ],
             index=2
         )
@@ -817,7 +817,7 @@ else:
     ch4_g_dia = 200.0
     co2e_anual = 2000.0
 
-# --- FUNCIÓN GENERADORA DE PDF ---
+# --- FUNCIÓN GENERADORA DE PDF ROBUSTA Y CORREGIDA ---
 class PDFReport(FPDF):
     def header(self):
         self.set_font('Arial', 'B', 12)
@@ -836,7 +836,9 @@ def generar_pdf_reporte():
     pdf.add_page()
     
     def safe_str(txt):
-        return str(txt).encode('latin-1', 'replace').decode('latin-1')
+        if not isinstance(txt, str):
+            txt = str(txt)
+        return txt.encode('latin-1', 'ignore').decode('latin-1')
 
     pdf.set_font('Arial', 'B', 11)
     pdf.set_text_color(15, 23, 42)
@@ -898,13 +900,16 @@ def generar_pdf_reporte():
         pdf.cell(100, 6, safe_str("COSTO TOTAL POR TONELADA"), 1, 0, 'L')
         pdf.cell(90, 6, safe_str(f"${costo_ton_optimizado:,.2f} MXN"), 1, 1, 'C')
 
-    output = pdf.output()
-    if isinstance(output, bytes):
-        return output
-    elif isinstance(output, bytearray):
-        return bytes(output)
-    else:
-        return output.encode('latin1')
+    try:
+        res = pdf.output(dest='S')
+        if isinstance(res, str):
+            return res.encode('latin1')
+        elif isinstance(res, (bytes, bytearray)):
+            return bytes(res)
+        else:
+            return bytes(pdf.output())
+    except Exception:
+        return bytes(pdf.output())
 
 # --- 6. INTERFAZ MODULAR POR PESTAÑAS (12 TABS ULTRA AI) ---
 tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10, tab11, tab12 = st.tabs([
@@ -1273,7 +1278,7 @@ with tab7:
             mime="application/pdf",
             use_container_width=True
         )
-        st.success("¡El reporte PDF Ultra se ha generado correctamente!")
+        st.success("¡El reporte PDF Ultra se ha generado correctamente y está listo para descargar!")
     else:
         st.warning("⚠️ Resuelve las restricciones nutricionales para habilitar la descarga.")
 
