@@ -416,7 +416,7 @@ if "df_collares_state" not in st.session_state:
         ]
     })
 
-# --- 5. BARRA LATERAL ---
+# --- 5. BARRA LATERAL (CON EXPANDERS LIMPIOS Y SIN TEXTO EMPALMADO) ---
 st.sidebar.markdown(f"### 🎛️ Panel Ultra AI NutriON")
 st.sidebar.markdown(f"👤 **Usuario:** {st.session_state.current_user.capitalize()}")
 st.sidebar.markdown(f"🛡️ **Licencia:** {plan_activo_usuario}")
@@ -446,7 +446,7 @@ if st.sidebar.button("🚪 Cerrar Sesión", use_container_width=True):
 
 st.sidebar.markdown("---")
 
-with st.sidebar.expander("🐄 1. Lote, Pesos y Población", expanded=False):
+with st.sidebar.expander("🐄 Lote, Pesos y Población", expanded=False):
     cantidad_animales = st.number_input("Número de Cabezas en el Lote", min_value=1, max_value=5000, value=100, step=10)
     peso_actual = st.slider("Peso Actual / Compra (kg)", min_value=200.0, max_value=650.0, value=250.0, step=10.0)
     peso_objetivo = st.slider("Peso de Venta / Meta (kg)", min_value=400.0, max_value=750.0, value=520.0, step=10.0)
@@ -457,7 +457,7 @@ with st.sidebar.expander("🐄 1. Lote, Pesos y Población", expanded=False):
     else:
         gde = 1.6
 
-with st.sidebar.expander("💰 2. Parámetros Económicos y Sanidad", expanded=False):
+with st.sidebar.expander("💰 Parámetros Económicos y Sanidad", expanded=False):
     precio_compra_kg = st.number_input("Compra Becerro Base (MXN/kg)", min_value=30.0, max_value=100.0, value=55.0, step=1.0)
     precio_venta_kg = st.number_input("Venta Ganado Gordo Base (MXN/kg)", min_value=30.0, max_value=100.0, value=50.0, step=1.0)
     
@@ -472,18 +472,18 @@ with st.sidebar.expander("💰 2. Parámetros Económicos y Sanidad", expanded=F
     st.markdown("---")
     costo_mano_obra_fijo = st.number_input("Mano de Obra y Operación (MXN/cab)", min_value=0.0, max_value=3000.0, value=450.0, step=50.0)
 
-with st.sidebar.expander("🌾 3. Sistema de Producción y Pastoreo", expanded=False):
+with st.sidebar.expander("🌾 Sistema de Producción y Pastoreo", expanded=False):
     sistema_produccion = st.selectbox("Sistema", ["Corral / Engorda Intensiva (Feedlot)", "Semi-estabulado (Mixto / Suplementación en Pastoreo)", "Pastoreo Extensivo (Praderas / Agostadero)"])
     condiciones_pastoreo = st.selectbox("Condiciones Pastoreo", ["N/A (Corral Intensivo)", "Pradera Cultivada / Riego (Alta Calidad)", "Pradera Nativa / Agostadero en Temporal", "Pradera Nativa / Agostadero Árido (Alta Caminata)", "Sistema Silvopastoril / Arbustivo"])
     estado_pasto = st.selectbox("Estado del Pasto", ["N/A (Corral / Sin Pastoreo)", "Vegetativo Temprano (Alta digestibilidad y PC)", "Vegetativo Tardío / Pre-floración (Calidad media)", "Floración / Madurez (Fibroso, baja PC)", "Lignificado / Seco (Muy baja digestibilidad)"])
     estacion = st.selectbox("Temporada / Clima", ["Templado", "Invierno", "Verano"])
 
-with st.sidebar.expander("🧬 4. Genética, Sexo y Marco", expanded=False):
+with st.sidebar.expander("🧬 Genética, Sexo y Marco", expanded=False):
     raza_seleccionada = st.selectbox("Raza", ["Compuestas / Adaptadas (Beefmaster/Brangus)", "Británicas (Angus/Hereford)", "Continentales (Charolais/Simmental)", "Cebú / Tropicales (Bos indicus)", "Ganado Criollo / Local"])
     sexo_lote = st.selectbox("Categoría Zootécnica", ["Novillos (Castrados)", "Toros Enteros", "Vaquillas de Repasto/Engorda", "Vacas de Desecho / Finalización"])
     marco_lote = st.selectbox("Tamaño de Marco", ["Mediano (Standard)", "Precoz / Engrase rápido", "Grande (Continental / Retrasado)"])
 
-with st.sidebar.expander("🌡️ 5. Variables Avanzadas y JDS", expanded=False):
+with st.sidebar.expander("🌡️ Variables Avanzadas y JDS", expanded=False):
     condicion_corporal = st.slider("Condición Corporal (1.0 - 5.0)", min_value=1.0, max_value=5.0, value=2.5, step=0.5)
     nivel_thi = st.selectbox("Estrés Térmico (THI)", ["Confort Térmico (< 74)", "Estrés Moderado (74-78)", "Estrés Severo (> 78)"])
     perfil_aa = st.selectbox("Modelo Aminoácidos", ["Estándar (Proteína Cruda)", "Avanzado (Optimización Lisina:Metionina 3:1)"])
