@@ -11,7 +11,7 @@ import os
 import hashlib
 from datetime import datetime, timedelta
 
-# --- 1. CONFIGURACIÓN DE PÁGINA Y DISEÑO SaaS PROFESIONAL (CALIBRI & UI/UX) ---
+# --- 1. CONFIGURACIÓN DE PÁGINA Y DISEÑO SaaS PROFESIONAL ---
 st.set_page_config(
     page_title="Nutri-ON 360 ULTRA V1.0 IA & IoT | Precisión Nutricional y Collares",
     page_icon="🐄",
@@ -139,7 +139,7 @@ def cargar_usuarios_persistentes():
             "password": hash_password("1234"),
             "email": "admin@nutrion360.com",
             "subscription_active": True,
-            "plan": "Anual Nacional Elite (12 Meses - $800 MXN/mes | Total: $9,600 MXN): “¡Ahorra $2,400 MXN! La opción más inteligente de los ganaderos de élite: acceso ilimitado a toda la red IoT con 20% de descuento y máximo ROI.”",
+            "plan": "Anual Nacional Elite (12 Meses - $800 MXN/mes | Total: $9,600 MXN)",
             "auto_renew": True,
             "next_renewal_date": (datetime.now() + timedelta(days=365)).strftime("%Y-%m-%d"),
             "fecha_registro": "2026-01-01"
@@ -148,7 +148,7 @@ def cargar_usuarios_persistentes():
             "password": hash_password("elite360"),
             "email": "alejandro.castaneda@nutrion360.com",
             "subscription_active": True,
-            "plan": "Anual Nacional Elite (12 Meses - $800 MXN/mes | Total: $9,600 MXN): “¡Ahorra $2,400 MXN! La opción más inteligente de los ganaderos de élite: acceso ilimitado a toda la red IoT con 20% de descuento y máximo ROI.”",
+            "plan": "Anual Nacional Elite (12 Meses - $800 MXN/mes | Total: $9,600 MXN)",
             "auto_renew": True,
             "next_renewal_date": (datetime.now() + timedelta(days=365)).strftime("%Y-%m-%d"),
             "fecha_registro": "2026-01-01"
@@ -172,49 +172,50 @@ if "nutrion_messages" not in st.session_state:
         {"role": "assistant", "content": "¡Hola! Soy **Nutri-ON**, tu consultor experto en nutrición y engorda bovina. Estoy conectado con tus datos de lote (sensores NIR, collares IoT y el motor de optimización). ¿Qué problema o desafío tienes hoy en el rancho? (Ej: *'mis becerros bajaron el consumo'*, *'el costo del alimento está muy alto'* o *'tengo sospecha de acidosis'*)."}
     ]
 
-# --- PANTALLA DE ACCESO / SUSCRIPCIÓN SI NO ESTÁ AUTENTICADO ---
+# --- PANTALLA DE ACCESO / SUSCRIPCIÓN SEPARADA SI NO ESTÁ AUTENTICADO ---
 if not st.session_state.authenticated:
     st.markdown("""
-        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px; margin-top: 30px;">
-            <div style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); padding: 18px; border-radius: 22px; box-shadow: 0 12px 30px rgba(5, 150, 105, 0.35);">
-                <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="32" cy="32" r="30" fill="url(#paint0_linear)" />
-                  <path d="M18 36C18 28 24 22 32 22C40 22 46 28 46 36C46 40 43 43 40 44H24C21 43 18 40 18 36Z" fill="#ffffff" fill-opacity="0.2"/>
+        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 15px; margin-top: 25px;">
+            <div style="background: linear-gradient(135deg, #064e3b 0%, #059669 100%); padding: 22px; border-radius: 26px; box-shadow: 0 15px 35px rgba(5, 150, 105, 0.35); border: 2px solid #34d399;">
+                <svg width="72" height="72" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="32" cy="32" r="30" fill="#ffffff" fill-opacity="0.12" stroke="#ffffff" stroke-width="2"/>
+                  <path d="M18 36C18 28 24 22 32 22C40 22 46 28 46 36C46 40 43 43 40 44H24C21 43 18 40 18 36Z" fill="#ffffff" fill-opacity="0.25"/>
                   <path d="M22 23L16 16M42 23L48 16" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
                   <circle cx="28" cy="32" r="2.5" fill="#fbbf24"/>
                   <circle cx="36" cy="32" r="2.5" fill="#fbbf24"/>
                   <path d="M29 38C30.5 39.5 33.5 39.5 35 38" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
                   <path d="M32 14V22" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
                   <path d="M28 17L32 14L36 17" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                  <defs>
-                    <linearGradient id="paint0_linear" x1="4" y1="4" x2="60" y2="60" gradientUnits="userSpaceOnUse">
-                      <stop stop-color="#047857"/>
-                      <stop offset="1" stop-color="#059669"/>
-                    </linearGradient>
-                  </defs>
                 </svg>
             </div>
         </div>
-        <h2 style="text-align: center; color: #064e3b; font-family: 'Calibri', sans-serif; font-weight: 800; margin-bottom: 2px;">
-            Nutri-ON <span style="color: #059669;">360</span> <span style="font-size: 0.5em; background: #059669; color: white; padding: 2px 8px; border-radius: 6px; vertical-align: middle;">ULTRA V1.0 IA & IOT</span>
-        </h2>
-        <p style="text-align: center; color: #059669; font-family: 'Calibri', sans-serif; font-weight: 700; font-size: 0.95rem; margin-bottom: 8px;">
-            Nutrición de precisión, programación lineal avanzada, collares IoT y salud animal.
+        <h1 style="text-align: center; color: #064e3b; font-family: 'Calibri', sans-serif; font-weight: 800; margin-bottom: 2px; font-size: 2.2rem;">
+            Nutri-ON <span style="color: #059669;">360</span> <span style="font-size: 0.45em; background: #059669; color: white; padding: 4px 10px; border-radius: 8px; vertical-align: middle;">ULTRA V1.0 IA & IOT</span>
+        </h1>
+        <p style="text-align: center; color: #059669; font-family: 'Calibri', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 6px; font-style: italic;">
+            Maximiza la eficiencia a través de modelos lineales: precisión nutricional absoluta al costo mínimo.
         </p>
-        <p style="text-align: center; color: #475569; font-family: 'Calibri', sans-serif; font-size: 0.85rem; margin-bottom: 25px;">
-            Plataforma Global de Optimización, Smart Collars y Consultoría Experta Remota
+        <p style="text-align: center; color: #1e293b; font-family: 'Calibri', sans-serif; font-weight: 800; font-size: 0.8rem; margin-bottom: 30px; letter-spacing: 0.8px;">
+            DESARROLLADA Y CREADA POR: DR. ALEJANDRO CASTAÑEDA CORREA
         </p>
     """, unsafe_allow_html=True)
 
-    tab_login, tab_register = st.tabs(["🔑 Iniciar Sesión", "💳 Planes Ultra AI & Registro"])
+    # SEPARACIÓN VISUAL CLARA EN DOS BLOQUES: LOGIN VS PLANES DE SUSCRIPCIÓN
+    col_login, col_planes = st.columns(2, gap="large")
 
-    with tab_login:
-        st.markdown("### Acceso con Usuario y Contraseña")
+    with col_login:
+        st.markdown("""
+            <div style="background: #ffffff; padding: 24px; border-radius: 18px; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06); border: 1px solid #e2e8f0; height: 100%;">
+                <h3 style="color: #064e3b; margin-top: 0; font-size: 1.25rem;">🔑 Acceso de Usuarios</h3>
+                <p style="color: #64748b; font-size: 0.85rem; margin-bottom: 18px;">Ingresa con tus credenciales si ya cuentas con una licencia activa.</p>
+            </div>
+        """, unsafe_allow_html=True)
+        
         user_input = st.text_input("Nombre de Usuario", key="login_user")
         pass_input = st.text_input("Contraseña", type="password", key="login_pass")
+        st.markdown("<br>", unsafe_allow_html=True)
         
-        st.markdown("")
-        if st.button("Entrar a la Plataforma Ultra AI", use_container_width=True):
+        if st.button("🚀 Entrar a la Plataforma Ultra AI", use_container_width=True):
             db_usuarios = cargar_usuarios_persistentes()
             hashed_pass = hash_password(pass_input)
             
@@ -229,91 +230,74 @@ if not st.session_state.authenticated:
             else:
                 st.error("Usuario o contraseña incorrectos. Verifica tus datos.")
 
-    with tab_register:
-        st.markdown("### 🌟 Selección de Plan Ultra AI & IoT")
-        st.markdown("Elige el periodo de suscripción con acceso total a sensores NIR, collares IoT y motor de precisión:")
+    with col_planes:
+        st.markdown("""
+            <div style="background: #ffffff; padding: 24px; border-radius: 18px; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06); border: 1px solid #e2e8f0; height: 100%;">
+                <h3 style="color: #064e3b; margin-top: 0; font-size: 1.25rem;">💳 Planes de Suscripción</h3>
+                <p style="color: #64748b; font-size: 0.85rem; margin-bottom: 18px;">Selecciona tu membresía y regístrate para activar acceso total.</p>
+            </div>
+        """, unsafe_allow_html=True)
         
         plan_elegido = st.radio(
-            "Planes de Suscripción Nutri-ON 360 Disponibles:",
+            "Selecciona tu Plan Ultra AI:",
             [
-                "Trimestral (3 Meses - $1,000 MXN/mes | Total: $3,000 MXN): \"Flexibilidad y control total para tu ciclo actual de engorda con inversión inteligente.\"",
-                "Semestral Feedlot (6 Meses - $900 MXN/mes | Total: $5,400 MXN): “¡Ahorra $600 MXN! El equilibrio perfecto para optimizar ciclos completos con un 10% de ahorro directo.”",
-                "Anual Nacional Elite (12 Meses - $800 MXN/mes | Total: $9,600 MXN): “¡Ahorra $2,400 MXN! La opción más inteligente de los ganaderos de élite: acceso ilimitado a toda la red IoT con 20% de descuento y máximo ROI.”"
+                "Trimestral (3 Meses - $1,000 MXN/mes | Total: $3,000 MXN): Flexibilidad y control total para tu ciclo actual de engorda con inversión inteligente.",
+                "Semestral Feedlot (6 Meses - $900 MXN/mes | Total: $5,400 MXN): ¡Ahorra $600 MXN! El equilibrio perfecto para optimizar ciclos completos con un 10% de ahorro directo.",
+                "Anual Nacional Elite (12 Meses - $800 MXN/mes | Total: $9,600 MXN): ¡Ahorra $2,400 MXN! La opción más inteligente de los ganaderos de élite: acceso ilimitado a toda la red IoT con 20% de descuento y máximo ROI."
             ],
-            index=2
+            index=2,
+            key="radio_planes_inicio"
         )
         
-        st.markdown("---")
-        st.markdown("##### 📝 Datos de Cuenta, Pago Seguro y Renovación Automática")
-        
-        col_r1, col_r2 = st.columns(2)
-        with col_r1:
-            new_user = st.text_input("Nombre de Usuario Deseado", key="reg_user")
-            new_email = st.text_input("Correo Electrónico (para notificaciones y avisos)", key="reg_email")
-        with col_r2:
-            new_pass = st.text_input("Contraseña", type="password", key="reg_pass")
+        with st.expander("📝 Registrarse y Pagar Licencia Nueva", expanded=False):
+            new_user = st.text_input("Usuario Deseado", key="reg_user")
+            new_email = st.text_input("Correo Electrónico", key="reg_email")
+            new_pass = st.text_input("Contraseña Nueva", type="password", key="reg_pass")
             confirm_pass = st.text_input("Confirma Contraseña", type="password", key="reg_conf")
-        
-        st.markdown("")
-        col_p1, col_p2, col_p3 = st.columns([2, 1, 1])
-        with col_p1:
-            num_tarjeta = st.text_input("Número de Tarjeta de Crédito / Débito", placeholder="4000 1234 5678 9010", key="reg_card")
-        with col_p2:
-            exp_tarjeta = st.text_input("Expiración (MM/AA)", placeholder="12/28", key="reg_exp")
-        with col_p3:
-            cvv_tarjeta = st.text_input("CVV", type="password", placeholder="123", key="reg_cvv")
-        
-        st.markdown("")
-        
-        auto_renew_enabled = st.checkbox(
-            "🔄 **Activar Renovación Automática** (La suscripción se cobrará y renovará automáticamente al cumplirse el periodo elegido, garantizando monitoreo ininterrumpido).",
-            value=True
-        )
-        
-        st.markdown("")
-        
-        if "Total: $3,000" in plan_elegido:
-            costo_str = "$3,000 MXN"
-        elif "Total: $5,400" in plan_elegido:
-            costo_str = "$5,400 MXN"
-        else:
-            costo_str = "$9,600 MXN"
-        
-        if st.button(f"💳 Pagar {costo_str} y Activar Licencia Ultra AI", use_container_width=True):
-            db_usuarios = cargar_usuarios_persistentes()
             
-            if not new_user or not new_email or not new_pass or not num_tarjeta:
-                st.warning("⚠️ Por favor, completa todos los campos de registro y de pago.")
-            elif new_user in db_usuarios:
-                st.error("⚠️ El nombre de usuario ya existe. Elige otro o inicia sesión.")
-            elif new_pass != confirm_pass:
-                st.error("⚠️ Las contraseñas no coinciden.")
-            elif len(num_tarjeta.replace(" ", "")) < 15:
-                st.error("⚠️ Número de tarjeta inválido. Verifica los dígitos.")
+            num_tarjeta = st.text_input("Número de Tarjeta (Débito/Crédito)", placeholder="4000 1234 5678 9010", key="reg_card")
+            col_exp, col_cvv = st.columns(2)
+            with col_exp:
+                exp_tarjeta = st.text_input("Expiración", placeholder="12/28", key="reg_exp")
+            with col_cvv:
+                cvv_tarjeta = st.text_input("CVV", type="password", placeholder="123", key="reg_cvv")
+                
+            auto_renew_enabled = st.checkbox("🔄 Activar Renovación Automática", value=True, key="reg_autorenew")
+            
+            if "Total: $3,000" in plan_elegido:
+                costo_str = "$3,000 MXN"
+            elif "Total: $5,400" in plan_elegido:
+                costo_str = "$5,400 MXN"
             else:
-                dias_periodo = 90 if "Trimestral" in plan_elegido else (180 if "Semestral" in plan_elegido else 365)
-                fecha_renovacion = (datetime.now() + timedelta(days=dias_periodo)).strftime("%Y-%m-%d")
+                costo_str = "$9,600 MXN"
                 
-                db_usuarios[new_user] = {
-                    "password": hash_password(new_pass),
-                    "email": new_email,
-                    "subscription_active": True,
-                    "plan": plan_elegido,
-                    "auto_renew": auto_renew_enabled,
-                    "next_renewal_date": fecha_renovacion,
-                    "fecha_registro": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                }
-                guardar_usuarios_persistentes(db_usuarios)
-                
-                st.success(f"🎉 **¡Pago Exitoso de {costo_str} ({plan_elegido})!** Transacción aprobada.")
-                if auto_renew_enabled:
-                    st.info(f"🔄 **Renovación Automática Activada:** Tu próxima renovación está programada para el **{fecha_renovacion}**.")
-                st.success(f"📧 **Notificación Enviada:** Se ha enviado el comprobante fiscal y tus accesos a **{new_email}**.")
-                
-                st.session_state.authenticated = True
-                st.session_state.current_user = new_user
-                st.balloons()
-                st.rerun()
+            if st.button(f"💳 Pagar {costo_str} y Activar Licencia", use_container_width=True):
+                db_usuarios = cargar_usuarios_persistentes()
+                if not new_user or not new_email or not new_pass or not num_tarjeta:
+                    st.warning("⚠️ Completa todos los campos de registro y pago.")
+                elif new_user in db_usuarios:
+                    st.error("⚠️ El usuario ya existe.")
+                elif new_pass != confirm_pass:
+                    st.error("⚠️ Las contraseñas no coinciden.")
+                else:
+                    dias_periodo = 90 if "Trimestral" in plan_elegido else (180 if "Semestral" in plan_elegido else 365)
+                    fecha_renovacion = (datetime.now() + timedelta(days=dias_periodo)).strftime("%Y-%m-%d")
+                    
+                    db_usuarios[new_user] = {
+                        "password": hash_password(new_pass),
+                        "email": new_email,
+                        "subscription_active": True,
+                        "plan": plan_elegido,
+                        "auto_renew": auto_renew_enabled,
+                        "next_renewal_date": fecha_renovacion,
+                        "fecha_registro": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    }
+                    guardar_usuarios_persistentes(db_usuarios)
+                    st.success(f"🎉 ¡Pago Exitoso de {costo_str}! Licencia activada.")
+                    st.session_state.authenticated = True
+                    st.session_state.current_user = new_user
+                    st.balloons()
+                    st.rerun()
 
     st.stop()
 
@@ -326,33 +310,27 @@ next_ren_date = user_info.get("next_renewal_date", "N/A")
 
 st.markdown("""
     <div style="display: flex; align-items: center; background: linear-gradient(135deg, #ffffff 0%, #ecfdf5 50%, #fef3c7 100%); padding: 22px 26px; border-radius: 20px; box-shadow: 0 15px 35px -10px rgba(5, 150, 105, 0.15); margin-bottom: 24px; border: 2px solid #34d399; flex-wrap: wrap; gap: 20px;">
-        <div style="flex-shrink: 0; background: linear-gradient(135deg, #059669 0%, #10b981 100%); padding: 12px; border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(5, 150, 105, 0.3);">
+        <div style="flex-shrink: 0; background: linear-gradient(135deg, #064e3b 0%, #059669 100%); padding: 12px; border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(5, 150, 105, 0.3);">
             <svg width="48" height="48" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="32" cy="32" r="30" fill="url(#paint0_linear)" />
-              <path d="M18 36C18 28 24 22 32 22C40 22 46 28 46 36C46 40 43 43 40 44H24C21 43 18 40 18 36Z" fill="#ffffff" fill-opacity="0.2"/>
+              <circle cx="32" cy="32" r="30" fill="#ffffff" fill-opacity="0.12" stroke="#ffffff" stroke-width="2"/>
+              <path d="M18 36C18 28 24 22 32 22C40 22 46 28 46 36C46 40 43 43 40 44H24C21 43 18 40 18 36Z" fill="#ffffff" fill-opacity="0.25"/>
               <path d="M22 23L16 16M42 23L48 16" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
               <circle cx="28" cy="32" r="2.5" fill="#fbbf24"/>
               <circle cx="36" cy="32" r="2.5" fill="#fbbf24"/>
               <path d="M29 38C30.5 39.5 33.5 39.5 35 38" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
               <path d="M32 14V22" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
               <path d="M28 17L32 14L36 17" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-              <defs>
-                <linearGradient id="paint0_linear" x1="4" y1="4" x2="60" y2="60" gradientUnits="userSpaceOnUse">
-                  <stop stop-color="#047857"/>
-                  <stop offset="1" stop-color="#059669"/>
-                </linearGradient>
-              </defs>
             </svg>
         </div>
         <div style="flex-grow: 1; min-width: 240px;">
             <h1 style="margin: 0; font-size: 1.8em; color: #064e3b; letter-spacing: -0.8px; font-weight: 800; font-family: 'Calibri', sans-serif;">
                 Nutri-ON <span style="background: linear-gradient(135deg, #059669, #10b981); color: #ffffff; padding: 3px 10px; border-radius: 8px; font-size: 0.5em; vertical-align: middle; font-weight: 700; letter-spacing: 0.8px; box-shadow: 0 4px 10px rgba(5,150,105,0.3);">360 ULTRA V1.0 IA & IOT</span>
             </h1>
-            <p style="margin: 2px 0 2px 0; font-size: 0.82em; color: #059669; font-weight: 700; font-family: 'Calibri', sans-serif;">
-                Optimización lineal de precisión, sensores NIR, collares IoT y salud animal en tiempo real.
+            <p style="margin: 2px 0 2px 0; font-size: 0.82em; color: #059669; font-weight: 700; font-family: 'Calibri', sans-serif; font-style: italic;">
+                Maximiza la eficiencia a través de modelos lineales: precisión nutricional absoluta al costo mínimo.
             </p>
             <p style="margin: 3px 0 2px 0; font-size: 0.88em; color: #1e293b; font-weight: 600; font-family: 'Calibri', sans-serif;">
-                Usuario: <span style="color: #059669; font-weight: 700;">{user}</span> | Licencia: <span style="color: #d97706; font-weight: 700;">{plan}</span> | Creado por: Dr. Alejandro Castañeda Correa
+                Usuario: <span style="color: #059669; font-weight: 700;">{user}</span> | Licencia: <span style="color: #d97706; font-weight: 700;">{plan}</span> | <span style="font-size: 0.8em; font-weight: 800;">DESARROLLADA Y CREADA POR: DR. ALEJANDRO CASTAÑEDA CORREA</span>
             </p>
         </div>
     </div>
@@ -777,7 +755,7 @@ ingreso_venta_cab = peso_objetivo * precio_venta_kg
 utilidad_neta_cab = ingreso_venta_cab - costo_total_cab
 roi_cab = (utilidad_neta_cab / costo_total_cab) * 100 if costo_total_cab > 0 else 0
 
-# --- CÁLCULO GLOBAL DE EMISIONES Y NUTRIENTES (GLOBAL SCOPE) ---
+# --- CÁLCULO GLOBAL DE EMISIONES Y NUTRIENTES ---
 if resultado.success:
     pc_arr = df_base["Proteina Cruda (PC % MS)"].astype(float).values / 100.0
     neg_arr = df_base["NEg (Mcal/kg)"].astype(float).values
@@ -817,7 +795,7 @@ else:
     ch4_g_dia = 200.0
     co2e_anual = 2000.0
 
-# --- FUNCIÓN GENERADORA DE PDF ROBUSTA Y CORREGIDA ---
+# --- FUNCIÓN GENERADORA DE PDF ROBUSTA ---
 class PDFReport(FPDF):
     def header(self):
         self.set_font('Arial', 'B', 12)
