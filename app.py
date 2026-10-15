@@ -84,9 +84,9 @@ st.markdown("""
         border-radius: 10px;
         font-weight: 600;
         color: #334155 !important;
-        font-size: 0.78rem !important;
+        font-size: 0.85rem !important;
         font-family: 'Calibri', sans-serif !important;
-        padding: 8px 10px;
+        padding: 10px 16px;
         background-color: transparent;
         transition: background-color 0.2s ease;
     }
@@ -172,10 +172,10 @@ if "nutrion_messages" not in st.session_state:
         {"role": "assistant", "content": "¡Hola! Soy **Nutri-ON**, tu consultor experto en nutrición y engorda bovina. Estoy conectado con tus datos de lote (sensores NIR, collares IoT y el motor de optimización). ¿Qué problema o desafío tienes hoy en el rancho? (Ej: *'mis becerros bajaron el consumo'*, *'el costo del alimento está muy alto'* o *'tengo sospecha de acidosis'*)."}
     ]
 
-# --- PANTALLA DE ACCESO / SUSCRIPCIÓN SEPARADA SI NO ESTÁ AUTENTICADO ---
+# --- ENCABEZADO PRINCIPAL PARA LA PANTALLA INICIAL ---
 if not st.session_state.authenticated:
     st.markdown("""
-        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 15px; margin-top: 25px;">
+        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 15px; margin-top: 20px;">
             <div style="background: linear-gradient(135deg, #064e3b 0%, #059669 100%); padding: 22px; border-radius: 26px; box-shadow: 0 15px 35px rgba(5, 150, 105, 0.35); border: 2px solid #34d399;">
                 <svg width="72" height="72" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <circle cx="32" cy="32" r="30" fill="#ffffff" fill-opacity="0.12" stroke="#ffffff" stroke-width="2"/>
@@ -195,26 +195,24 @@ if not st.session_state.authenticated:
         <p style="text-align: center; color: #059669; font-family: 'Calibri', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 6px; font-style: italic;">
             Maximiza la eficiencia a través de modelos lineales: precisión nutricional absoluta al costo mínimo.
         </p>
-        <p style="text-align: center; color: #1e293b; font-family: 'Calibri', sans-serif; font-weight: 800; font-size: 0.8rem; margin-bottom: 30px; letter-spacing: 0.8px;">
+        <p style="text-align: center; color: #1e293b; font-family: 'Calibri', sans-serif; font-weight: 800; font-size: 0.8rem; margin-bottom: 25px; letter-spacing: 0.8px;">
             DESARROLLADA Y CREADA POR: DR. ALEJANDRO CASTAÑEDA CORREA
         </p>
     """, unsafe_allow_html=True)
 
-    # SEPARACIÓN VISUAL CLARA EN DOS BLOQUES: LOGIN VS PLANES DE SUSCRIPCIÓN
-    col_login, col_planes = st.columns(2, gap="large")
+    # SEPARACIÓN EN PÁGINAS INDEPENDIENTES VÍA TABS A ANCHO COMPLETO
+    tab_login_page, tab_plans_page = st.tabs(["🔑 Iniciar Sesión", "💳 Planes de Suscripción & Registro"])
 
-    with col_login:
-        st.markdown("""
-            <div style="background: #ffffff; padding: 24px; border-radius: 18px; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06); border: 1px solid #e2e8f0; height: 100%;">
-                <h3 style="color: #064e3b; margin-top: 0; font-size: 1.25rem;">🔑 Acceso de Usuarios</h3>
-                <p style="color: #64748b; font-size: 0.85rem; margin-bottom: 18px;">Ingresa con tus credenciales si ya cuentas con una licencia activa.</p>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        user_input = st.text_input("Nombre de Usuario", key="login_user")
-        pass_input = st.text_input("Contraseña", type="password", key="login_pass")
+    # --- PÁGINA 1: INICIO DE SESIÓN ---
+    with tab_login_page:
         st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("### 🔑 Iniciar Sesión con tu Cuenta")
+        st.markdown("Ingresa tu nombre de usuario y contraseña para acceder al sistema:")
         
+        user_input = st.text_input("Nombre de Usuario", key="login_user_only")
+        pass_input = st.text_input("Contraseña", type="password", key="login_pass_only")
+        
+        st.markdown("<br>", unsafe_allow_html=True)
         if st.button("🚀 Entrar a la Plataforma Ultra AI", use_container_width=True):
             db_usuarios = cargar_usuarios_persistentes()
             hashed_pass = hash_password(pass_input)
@@ -230,74 +228,87 @@ if not st.session_state.authenticated:
             else:
                 st.error("Usuario o contraseña incorrectos. Verifica tus datos.")
 
-    with col_planes:
-        st.markdown("""
-            <div style="background: #ffffff; padding: 24px; border-radius: 18px; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06); border: 1px solid #e2e8f0; height: 100%;">
-                <h3 style="color: #064e3b; margin-top: 0; font-size: 1.25rem;">💳 Planes de Suscripción</h3>
-                <p style="color: #64748b; font-size: 0.85rem; margin-bottom: 18px;">Selecciona tu membresía y regístrate para activar acceso total.</p>
-            </div>
-        """, unsafe_allow_html=True)
+    # --- PÁGINA 2: PLANES DE SUSCRIPCIÓN Y REGISTRO ---
+    with tab_plans_page:
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("### 🌟 Selecciona tu Plan de Suscripción Nutri-ON 360")
+        st.markdown("Elige la membresía que mejor se adapte al ciclo operativo de tu rancho:")
         
         plan_elegido = st.radio(
-            "Selecciona tu Plan Ultra AI:",
+            "Planes Disponibles:",
             [
-                "Trimestral (3 Meses - $1,000 MXN/mes | Total: $3,000 MXN): Flexibilidad y control total para tu ciclo actual de engorda con inversión inteligente.",
-                "Semestral Feedlot (6 Meses - $900 MXN/mes | Total: $5,400 MXN): ¡Ahorra $600 MXN! El equilibrio perfecto para optimizar ciclos completos con un 10% de ahorro directo.",
-                "Anual Nacional Elite (12 Meses - $800 MXN/mes | Total: $9,600 MXN): ¡Ahorra $2,400 MXN! La opción más inteligente de los ganaderos de élite: acceso ilimitado a toda la red IoT con 20% de descuento y máximo ROI."
+                "Trimestral (3 Meses - $1,000 MXN/mes | Total: $3,000 MXN): \"Flexibilidad y control total para tu ciclo actual de engorda con inversión inteligente.\"",
+                "Semestral Feedlot (6 Meses - $900 MXN/mes | Total: $5,400 MXN): “¡Ahorra $600 MXN! El equilibrio perfecto para optimizar ciclos completos con un 10% de ahorro directo.”",
+                "Anual Nacional Elite (12 Meses - $800 MXN/mes | Total: $9,600 MXN): “¡Ahorra $2,400 MXN! La opción más inteligente de los ganaderos de élite: acceso ilimitado a toda la red IoT con 20% de descuento y máximo ROI.”"
             ],
             index=2,
-            key="radio_planes_inicio"
+            key="radio_plans_page_only"
         )
         
-        with st.expander("📝 Registrarse y Pagar Licencia Nueva", expanded=False):
-            new_user = st.text_input("Usuario Deseado", key="reg_user")
-            new_email = st.text_input("Correo Electrónico", key="reg_email")
-            new_pass = st.text_input("Contraseña Nueva", type="password", key="reg_pass")
-            confirm_pass = st.text_input("Confirma Contraseña", type="password", key="reg_conf")
+        st.markdown("---")
+        st.markdown("### 📝 Registro de Usuario y Pago Seguro")
+        
+        col_r1, col_r2 = st.columns(2)
+        with col_r1:
+            new_user = st.text_input("Nombre de Usuario Deseado", key="reg_user_page")
+            new_email = st.text_input("Correo Electrónico (para comprobantes)", key="reg_email_page")
+        with col_r2:
+            new_pass = st.text_input("Contraseña", type="password", key="reg_pass_page")
+            confirm_pass = st.text_input("Confirma Contraseña", type="password", key="reg_conf_page")
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        col_p1, col_p2, col_p3 = st.columns([2, 1, 1])
+        with col_p1:
+            num_tarjeta = st.text_input("Número de Tarjeta de Crédito / Débito", placeholder="4000 1234 5678 9010", key="reg_card_page")
+        with col_p2:
+            exp_tarjeta = st.text_input("Expiración (MM/AA)", placeholder="12/28", key="reg_exp_page")
+        with col_p3:
+            cvv_tarjeta = st.text_input("CVV", type="password", placeholder="123", key="reg_cvv_page")
+        
+        auto_renew_enabled = st.checkbox(
+            "🔄 **Activar Renovación Automática** (La suscripción se cobrará automáticamente al término de cada periodo para mantener el servicio activo).",
+            value=True,
+            key="reg_autorenew_page"
+        )
+        
+        if "Total: $3,000" in plan_elegido:
+            costo_str = "$3,000 MXN"
+        elif "Total: $5,400" in plan_elegido:
+            costo_str = "$5,400 MXN"
+        else:
+            costo_str = "$9,600 MXN"
             
-            num_tarjeta = st.text_input("Número de Tarjeta (Débito/Crédito)", placeholder="4000 1234 5678 9010", key="reg_card")
-            col_exp, col_cvv = st.columns(2)
-            with col_exp:
-                exp_tarjeta = st.text_input("Expiración", placeholder="12/28", key="reg_exp")
-            with col_cvv:
-                cvv_tarjeta = st.text_input("CVV", type="password", placeholder="123", key="reg_cvv")
-                
-            auto_renew_enabled = st.checkbox("🔄 Activar Renovación Automática", value=True, key="reg_autorenew")
-            
-            if "Total: $3,000" in plan_elegido:
-                costo_str = "$3,000 MXN"
-            elif "Total: $5,400" in plan_elegido:
-                costo_str = "$5,400 MXN"
+        st.markdown("<br>", unsafe_allow_html=True)
+        if st.button(f"💳 Pagar {costo_str} y Activar Licencia Ultra AI", use_container_width=True, key="btn_register_page"):
+            db_usuarios = cargar_usuarios_persistentes()
+            if not new_user or not new_email or not new_pass or not num_tarjeta:
+                st.warning("⚠️ Completa todos los campos de registro y de pago.")
+            elif new_user in db_usuarios:
+                st.error("⚠️ El usuario ya existe. Por favor elige otro o inicia sesión.")
+            elif new_pass != confirm_pass:
+                st.error("⚠️ Las contraseñas no coinciden.")
+            elif len(num_tarjeta.replace(" ", "")) < 15:
+                st.error("⚠️ Número de tarjeta inválido. Verifica los dígitos.")
             else:
-                costo_str = "$9,600 MXN"
+                dias_periodo = 90 if "Trimestral" in plan_elegido else (180 if "Semestral" in plan_elegido else 365)
+                fecha_renovacion = (datetime.now() + timedelta(days=dias_periodo)).strftime("%Y-%m-%d")
                 
-            if st.button(f"💳 Pagar {costo_str} y Activar Licencia", use_container_width=True):
-                db_usuarios = cargar_usuarios_persistentes()
-                if not new_user or not new_email or not new_pass or not num_tarjeta:
-                    st.warning("⚠️ Completa todos los campos de registro y pago.")
-                elif new_user in db_usuarios:
-                    st.error("⚠️ El usuario ya existe.")
-                elif new_pass != confirm_pass:
-                    st.error("⚠️ Las contraseñas no coinciden.")
-                else:
-                    dias_periodo = 90 if "Trimestral" in plan_elegido else (180 if "Semestral" in plan_elegido else 365)
-                    fecha_renovacion = (datetime.now() + timedelta(days=dias_periodo)).strftime("%Y-%m-%d")
-                    
-                    db_usuarios[new_user] = {
-                        "password": hash_password(new_pass),
-                        "email": new_email,
-                        "subscription_active": True,
-                        "plan": plan_elegido,
-                        "auto_renew": auto_renew_enabled,
-                        "next_renewal_date": fecha_renovacion,
-                        "fecha_registro": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                    }
-                    guardar_usuarios_persistentes(db_usuarios)
-                    st.success(f"🎉 ¡Pago Exitoso de {costo_str}! Licencia activada.")
-                    st.session_state.authenticated = True
-                    st.session_state.current_user = new_user
-                    st.balloons()
-                    st.rerun()
+                db_usuarios[new_user] = {
+                    "password": hash_password(new_pass),
+                    "email": new_email,
+                    "subscription_active": True,
+                    "plan": plan_elegido,
+                    "auto_renew": auto_renew_enabled,
+                    "next_renewal_date": fecha_renovacion,
+                    "fecha_registro": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                }
+                guardar_usuarios_persistentes(db_usuarios)
+                
+                st.success(f"🎉 **¡Pago Exitoso de {costo_str}!** Tu licencia ha sido activada correctamente.")
+                st.session_state.authenticated = True
+                st.session_state.current_user = new_user
+                st.balloons()
+                st.rerun()
 
     st.stop()
 
